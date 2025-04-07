@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 
 public class SampleTest extends DriverManager{
 
+    // Sample test page
     SamplePage page;
 
     @Test(
