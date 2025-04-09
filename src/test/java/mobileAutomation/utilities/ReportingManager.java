@@ -39,7 +39,7 @@ public class ReportingManager {
         extent = new ExtentReports();
         extent.attachReporter(sparkReporter);
         extent.setSystemInfo("OS", System.getProperty("os.name"));
-        extent.setSystemInfo("Driver", configuration.driverName);
+        extent.setSystemInfo("Driver", configuration.platformName);
     }
 
     public ExtentTest createTest(ITestResult result) {

@@ -10,16 +10,10 @@ import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.ReportingManager;
 import mobileAutomation.utilities.automationInterfaces.ReportingInterface;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class ReportingFunction implements ReportingInterface {
 
     AppiumDriver mobileDriver;
     ExtentTest extentTest;
-
-    String time = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(new Date());
-    String reportFolderLocation = "TestReport/Report_" + time;
 
     public ReportingFunction(ContextManager context) {
         this.mobileDriver = context.mobileDriver;
