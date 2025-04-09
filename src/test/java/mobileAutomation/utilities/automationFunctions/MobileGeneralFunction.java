@@ -4,8 +4,13 @@ import io.appium.java_client.AppiumDriver;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
 
 
 public class MobileGeneralFunction implements MobileGeneralInterface {
@@ -61,5 +66,23 @@ public class MobileGeneralFunction implements MobileGeneralInterface {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void tapOnScreen(int xCoordinate, int yCoordinate) {
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence tap = new Sequence(finger, 1);
+
+        tap.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(),
+                xCoordinate, yCoordinate));
+        tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        sleep(1);
+        mobileDriver.perform(List.of(tap));
+        sleep(1);
+
+        System.out.println("=======Tapped on screen at coordinates: (" + xCoordinate + ", " + yCoordinate + ")=======");
     }
 }

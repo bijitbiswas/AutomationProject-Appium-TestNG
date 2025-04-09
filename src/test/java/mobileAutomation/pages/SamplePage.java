@@ -46,11 +46,14 @@ public class SamplePage extends PageActionManager {
             productName = "Sauce Labs Backpack - Black";
         }
         sleep(3);
-        checkScreenVisible("Landing_Page_No_Reset");
+        validateScreenVisible("LandingPage");
         click(sauceLabBackpackImage);
-        if (isPlatform("Android"))
+
+        if (isPlatform("Android")) {
+            // Additionally selecting one more item for android app
+            clickImage("AddMoreItemButton");
             clickByText("Add to cart");
-        else
+        } else
             clickByText("Add To Cart");
         click(cartBadge);
         validateElementText(productTitle, productName);

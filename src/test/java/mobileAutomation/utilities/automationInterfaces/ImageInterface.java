@@ -1,5 +1,7 @@
 package mobileAutomation.utilities.automationInterfaces;
 
+import mobileAutomation.utilities.Region;
+
 public interface ImageInterface {
 
     void validateScreenVisible(String screenName, Double matchThreshold);
@@ -10,9 +12,9 @@ public interface ImageInterface {
 
     void validateImageNotVisible(String imageName, Double matchThreshold);
 
-    void clickImage(String imageName);
+    void clickImage(String imageName, Double matchThreshold, int scalingFactor);
 
-
+    Region getVisualImageRegion(String imageName, Double matchThreshold , int scalingFactor );
 
 
 

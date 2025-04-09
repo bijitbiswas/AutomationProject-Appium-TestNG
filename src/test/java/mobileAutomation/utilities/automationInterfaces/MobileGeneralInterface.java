@@ -12,4 +12,6 @@ public interface MobileGeneralInterface {
 
     void sleep(int timeInSecs);
 
+    void tapOnScreen(int xCoordinate, int yCoordinate);
+
 }

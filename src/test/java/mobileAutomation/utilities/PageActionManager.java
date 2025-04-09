@@ -21,6 +21,7 @@ public class PageActionManager implements
     private final ImageInterface imageInterface;
     private final ReportingInterface reportingInterface;
     private final Double MATCH_THRESHOLD = 0.75;
+    private final int SCALING_FACTOR = 1;
 
     public PageActionManager(ContextManager context) {
         // To initialize the page elements in a generic way
@@ -122,7 +123,9 @@ public class PageActionManager implements
         mobileGeneralInterface.sleep(timeInSecs);
     }
 
-
+    public void tapOnScreen(int xCoordinate, int yCoordinate) {
+        mobileGeneralInterface.tapOnScreen(xCoordinate, yCoordinate);
+    }
 
 
     // ================== Image Functions ==================
@@ -130,7 +133,7 @@ public class PageActionManager implements
         imageInterface.validateScreenVisible(screenName, matchThreshold);
     }
 
-    public void checkScreenVisible(String screenName) {
+    public void validateScreenVisible(String screenName) {
         imageInterface.validateScreenVisible(screenName, MATCH_THRESHOLD);
     }
 
@@ -138,7 +141,7 @@ public class PageActionManager implements
         imageInterface.validateScreenNotVisible(screenName, matchThreshold);
     }
 
-    public void checkScreenNotVisible(String screenName) {
+    public void validateScreenNotVisible(String screenName) {
         imageInterface.validateScreenNotVisible(screenName, MATCH_THRESHOLD);
     }
 
@@ -146,13 +149,34 @@ public class PageActionManager implements
         imageInterface.validateImageVisible(imageName, matchThreshold);
     }
 
+    public void validateImageVisible(String imageName) {
+        imageInterface.validateImageVisible(imageName, MATCH_THRESHOLD);
+    }
+
     public void validateImageNotVisible(String imageName, Double matchThreshold) {
         imageInterface.validateImageNotVisible(imageName, matchThreshold);
     }
 
-    public void clickImage(String imageName) {
-        imageInterface.clickImage(imageName);
+    public void validateImageNotVisible(String imageName) {
+        imageInterface.validateImageNotVisible(imageName, MATCH_THRESHOLD);
     }
+
+    public Region getVisualImageRegion(String imageName, Double matchThreshold , int scalingFactor ) {
+        return imageInterface.getVisualImageRegion(imageName, matchThreshold, scalingFactor);
+    }
+
+    public Region getVisualImageRegion(String imageName ) {
+        return imageInterface.getVisualImageRegion(imageName, MATCH_THRESHOLD, SCALING_FACTOR);
+    }
+
+    public void clickImage(String imageName, Double matchThreshold, int scalingFactor) {
+        imageInterface.clickImage(imageName, matchThreshold, scalingFactor);
+    }
+
+    public void clickImage(String imageName) {
+        imageInterface.clickImage(imageName, MATCH_THRESHOLD, SCALING_FACTOR);
+    }
+
 
     // ================== Reporting Functions ==================
     public void addSuccessLabelWithScreenshot(String labelName) {

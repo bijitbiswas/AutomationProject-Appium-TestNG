@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sample automation suite" verbose="1"
+       configfailurepolicy="continue" thread-count="2" parallel="tests">
+
+    <test name="TC_01 Sample mobile automation test"
+          annotations="JDK" enabled="true" >
+        <classes>
+            <class name="mobileAutomation.testcases.SampleTest"/>
+        </classes>
+    </test>
+
+</suite>
