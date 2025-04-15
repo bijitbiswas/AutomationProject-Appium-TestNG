@@ -5,6 +5,7 @@ import io.appium.java_client.imagecomparison.OccurrenceMatchingOptions;
 import io.appium.java_client.imagecomparison.OccurrenceMatchingResult;
 import io.appium.java_client.imagecomparison.SimilarityMatchingOptions;
 import io.appium.java_client.imagecomparison.SimilarityMatchingResult;
+import mobileAutomation.Constants;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.Region;
 import mobileAutomation.utilities.automationInterfaces.ImageInterface;
@@ -30,9 +31,6 @@ public class ImageFunction implements ImageInterface {
     FluentWait<AppiumDriver> fluentWait;
     ContextManager context;
     private final String platformName;
-    private final String imageLocatorsPath = "src/test/java/mobileAutomation/imageLocators/";
-    private final String resultsPath = "VisualCheckResults/";
-    private final String dateTimePattern = "yyyy-MM-dd_HH-mm-ss";
     String dateTimeStamp = getCurrentDateTimeStamp();
 
     public ImageFunction(ContextManager context) {
@@ -103,7 +101,7 @@ public class ImageFunction implements ImageInterface {
 
         // Get the execution device name and replace spaces with empty string
         String executionDeviceName = new MobileGeneralFunction(context).getDeviceName().replace(" ", "");
-        String imageLocation = (imageLocatorsPath + platformName +"/BASELINE_") + imageName + "_" + executionDeviceName + ".png";
+        String imageLocation = (Constants.IMAGE_LOCATOR_PATH + platformName +"/BASELINE_") + imageName + "_" + executionDeviceName + ".png";
         File imageFile = getImageFile(imageLocation);
         System.out.println("=======Started visual search of image name BASELINE_" + imageName + "_" + executionDeviceName +" on screen======");
 
@@ -120,7 +118,7 @@ public class ImageFunction implements ImageInterface {
         // Find the occurrence of matched image on screen
         OccurrenceMatchingResult result = mobileDriver.findImageOccurrence(mobileDriver.getScreenshotAs(OutputType.FILE), imageFile, occurrence);
         // Save the matching image on screen with a red rectangle highlight
-        result.storeVisualization(new File(resultsPath + dateTimeStamp + "-CHECK_" + imageName +".png"));
+        result.storeVisualization(new File(Constants.IMAGE_RESULTS_FOLDER + dateTimeStamp + "-CHECK_" + imageName +".png"));
         System.out.println("=======Completed visual search of image name : BASELINE_" + imageName + "_" + executionDeviceName +"======");
         return result;
     }
@@ -143,7 +141,7 @@ public class ImageFunction implements ImageInterface {
 
         // Get the execution device name and replace spaces with empty string
         String executionDeviceName = new MobileGeneralFunction(context).getDeviceName().replace(" ", "");
-        String imageLocation = (imageLocatorsPath + platformName +"/BASELINE_") + screenName + "_" + executionDeviceName + ".png";
+        String imageLocation = (Constants.IMAGE_LOCATOR_PATH + platformName +"/BASELINE_") + screenName + "_" + executionDeviceName + ".png";
         File imageFile = getImageFile(imageLocation);
         System.out.println("=======Started visual search of screen name BASELINE_" + screenName + "_" + executionDeviceName +" on screen======");
 
@@ -172,7 +170,7 @@ public class ImageFunction implements ImageInterface {
 
         // If the similarity score is below the threshold, returning false
         if (result.getScore() < matchThreshold) {
-            File failureImageFile = new File(resultsPath + dateTimeStamp + "-FAIL_"+ screenName +".png");
+            File failureImageFile = new File(Constants.IMAGE_RESULTS_FOLDER + dateTimeStamp + "-FAIL_"+ screenName +".png");
             handleIOException(() -> result.storeVisualization(failureImageFile));
             System.out.println("=======Failed visual check of screen name BASELINE_" + screenName +
                     "_" + executionDeviceName + ". " + "Match score was only: " + result.getScore() +
@@ -180,7 +178,7 @@ public class ImageFunction implements ImageInterface {
                     "Error screenshot at " + failureImageFile.getAbsolutePath() +"======");
             return false;
         } else {
-            File successImageFile = new File(resultsPath + dateTimeStamp + "-CHECK_" + screenName +".png");
+            File successImageFile = new File(Constants.IMAGE_RESULTS_FOLDER + dateTimeStamp + "-CHECK_" + screenName +".png");
             handleIOException(() -> result.storeVisualization(successImageFile));
             System.out.println("=======Completed visual search of screen name BASELINE_" + screenName +
                     "_"+executionDeviceName+". " + "with match score of " + result.getScore());
@@ -190,12 +188,12 @@ public class ImageFunction implements ImageInterface {
 
     private String getCurrentDateTimeStamp() {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.EXTENT_REPORT_DATE_TIME_FORMAT);
         return now.format(formatter);
     }
 
     private void createResultsDirectory() {
-        Path path = Paths.get(resultsPath);
+        Path path = Paths.get(Constants.IMAGE_RESULTS_FOLDER);
         handleIOException(() -> {
             if (!Files.exists(path)) {
                 Files.createDirectory(path);

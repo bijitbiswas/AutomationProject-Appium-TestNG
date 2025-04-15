@@ -1,22 +1,24 @@
 package mobileAutomation.testcases;
 
-import mobileAutomation.pages.SamplePage;
+import mobileAutomation.pages.SampleMobilePage;
 import mobileAutomation.utilities.DriverManager;
 import org.testng.annotations.Test;
 
-public class SampleTest extends DriverManager{
+public class SampleMobileTest extends DriverManager{
 
-    // Sample test page
-    SamplePage page;
+    SampleMobilePage page;
 
     @Test(
             groups = {"Smoke", "Regression"},
+            dataProvider = "getTestData",
             description = "This is a sample TestNG test"
     )
-    public void addAndRemoveCartItem() {
+    public void addAndRemoveCartItem(String userName, String password) {
         System.out.println("Starting Sample Test");
 
-        page = new SamplePage(getDriverContext());
+        page = new SampleMobilePage(getDriverContext());
+
+        page.login(userName, password);
 
         page.addItemToCart();
 

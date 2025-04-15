@@ -4,6 +4,7 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
+import mobileAutomation.Constants;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -11,6 +12,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -36,9 +38,7 @@ public class DriverManager {
         AppiumDriverLocalService server = serverManager.startServer();
 
         AppiumDriver mobileDriver = createAppiumDriver(server);
-
         FluentWait<AppiumDriver> fluentWait = createFluentWait(mobileDriver);
-
         WebDriverWait wait = createWebDriverWait(mobileDriver);
 
         context.mobileDriver = mobileDriver;
@@ -53,6 +53,12 @@ public class DriverManager {
         System.out.println("=======Executing before method======");
         context.extentTest = report.createTest(result);
     }
+
+    @DataProvider(name = "getTestData")
+    public String[][] getTestData(Method method) {
+        return new ExcelManager().getMethodData(method.getName());
+    }
+
 
     @AfterMethod
     public void addResultToRun(ITestResult result) {
@@ -109,7 +115,7 @@ public class DriverManager {
             case "Android", "iOS" -> server.getUrl();
             case "Browserstack" -> {
                 try {
-                    yield new URL(configurationManager.browserStackURL);
+                    yield new URL(Constants.BROWSERSTACK_URL);
                 } catch (MalformedURLException e) {
                     throw new RuntimeException(e);
                 }

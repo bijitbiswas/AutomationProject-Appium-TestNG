@@ -1,6 +1,7 @@
 package mobileAutomation.utilities;
 
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.*;
 import mobileAutomation.utilities.automationInterfaces.*;
 import org.openqa.selenium.WebElement;
@@ -20,8 +21,8 @@ public class PageActionManager implements
     private final MobileGeneralInterface mobileGeneralInterface;
     private final ImageInterface imageInterface;
     private final ReportingInterface reportingInterface;
-    private final Double MATCH_THRESHOLD = 0.75;
-    private final int SCALING_FACTOR = 1;
+    private final Double MATCH_THRESHOLD = Constants.IMAGE_MATCH_THRESHOLD;
+    private final int SCALING_FACTOR = Constants.IMAGE_SCALING_FACTOR;
 
     public PageActionManager(ContextManager context) {
         // To initialize the page elements in a generic way
@@ -61,12 +62,20 @@ public class PageActionManager implements
 
     // ================== Validation Functions ==================
 
-    public WebElement waitForElementToBeVisible(WebElement element) {
-        return validationInterface.waitForElementToBeVisible(element);
+    public void waitForElementToBeVisible(WebElement element) {
+        validationInterface.waitForElementToBeVisible(element);
     }
 
-    public WebElement waitForElementToBeVisible(WebElement element, int timeoutInSecs) {
-        return validationInterface.waitForElementToBeVisible(element, timeoutInSecs);
+    public void waitForElementToBeVisible(WebElement element, int timeoutInSecs) {
+        validationInterface.waitForElementToBeVisible(element, timeoutInSecs);
+    }
+
+    public void waitForElementToBeInvisible(WebElement element) {
+        validationInterface.waitForElementToBeInvisible(element);
+    }
+
+    public void waitForElementToBeInvisible(WebElement element, int timeoutInSecs) {
+        validationInterface.waitForElementToBeInvisible(element, timeoutInSecs);
     }
 
     public boolean isElementVisible(WebElement element) {

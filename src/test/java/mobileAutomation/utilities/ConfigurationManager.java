@@ -21,9 +21,6 @@ public class ConfigurationManager {
     final DesiredCapabilities iOSCapabilities = loadCapabilities("iOSCapabilities");
     final DesiredCapabilities browserstackCapabilities = loadBrowserstackCapabilities();
     final Long waitTime = getWaitTime();
-    final String browserStackURL = "https://hub-cloud.browserstack.com/wd/hub";
-    final String appiumServerURL = "http://localhost:4723/";
-
 
     /**
      * Below methods are the supporting methods to load the configuration from config.properties file

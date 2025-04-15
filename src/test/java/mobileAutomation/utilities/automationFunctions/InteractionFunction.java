@@ -15,6 +15,7 @@ public class InteractionFunction implements InteractionInterface {
     AppiumDriver mobileDriver;
     WebDriverWait wait;
     FluentWait<AppiumDriver> fluentWait;
+    GeneralFunction generalFunction = new GeneralFunction();
 
     public InteractionFunction(ContextManager context) {
         this.mobileDriver = context.mobileDriver;
@@ -24,19 +25,18 @@ public class InteractionFunction implements InteractionInterface {
 
     @Override
     public void click(WebElement element) {
-        String elementText;
+        String elementName = generalFunction.getElementName(element);
         WebElement actionElement;
         try {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .visibilityOf(element)));
-            elementText = actionElement.getText().isEmpty()?"": actionElement.getText();
         } catch (Exception e){
-            System.out.println("=======Failed to find element to click======");
+            System.out.println("=======Failed to find element "+elementName+" to click======");
             e.printStackTrace();
             throw e;
         }
-        element.click();
-        System.out.println("=======Element "+elementText+" clicked=======");
+        actionElement.click();
+        System.out.println("=======Element "+elementName+" clicked=======");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class InteractionFunction implements InteractionInterface {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .elementToBeClickable(AppiumBy.xpath(xpathExpression))));
         } catch (Exception e) {
-            System.out.println("=======Failed to find element to click by text======");
+            System.out.println("=======Failed to find element to click by text "+elementText+"======");
             e.printStackTrace();
             throw e;
         }
@@ -62,7 +62,7 @@ public class InteractionFunction implements InteractionInterface {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .elementToBeClickable(AppiumBy.id(elementId))));
         } catch (TimeoutException e) {
-            System.out.println("=======Failed to find element to click by id======");
+            System.out.println("=======Failed to find element to click by id "+elementId+"======");
             e.printStackTrace();
             throw e;
         }
@@ -77,7 +77,7 @@ public class InteractionFunction implements InteractionInterface {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .elementToBeClickable(AppiumBy.accessibilityId(elementId))));
         } catch (TimeoutException e) {
-            System.out.println("=======Failed to find element to click by accessibilityId======");
+            System.out.println("=======Failed to find element to click by accessibilityId "+elementId+"======");
             e.printStackTrace();
             throw e;
         }
@@ -87,18 +87,19 @@ public class InteractionFunction implements InteractionInterface {
 
     @Override
     public void type(WebElement element, String text) {
+        String elementName = generalFunction.getElementName(element);
         WebElement actionElement;
         try {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .visibilityOf(element)));
         } catch (TimeoutException e) {
-            System.out.println("=======Failed to find element to type======");
+            System.out.println("=======Failed to find element "+elementName+" to type======");
             e.printStackTrace();
             throw e;
         }
         actionElement.clear();
         actionElement.sendKeys(text);
-        System.out.println("=======Text "+text+" typed on element=======");
+        System.out.println("=======Text "+text+" typed on element "+elementName+"=======");
     }
 
 }

@@ -9,6 +9,7 @@ import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.aventstack.extentreports.model.Media;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import io.appium.java_client.AppiumDriver;
+import mobileAutomation.Constants;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.testng.ITestContext;
@@ -20,8 +21,8 @@ import java.util.Date;
 
 public class ReportingManager {
 
-    private static final String time = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(new Date());
-    private final String reportFolderLocation = "TestReport/Report_" + time;
+    private static final String time = new SimpleDateFormat(Constants.EXTENT_REPORT_DATE_TIME_FORMAT).format(new Date());
+    private final String reportFolderLocation = Constants.EXTENT_REPORT_FOLDER_WITH_PREFIX + time;
     private ExtentReports extent;
     private ExtentTest test;
 
@@ -34,8 +35,8 @@ public class ReportingManager {
         System.out.println("=======Report will be generated at "+reportPath+"======");
 
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
-        sparkReporter.config().setDocumentTitle(suiteName + " Automation Execution Report");
-        sparkReporter.config().setReportName(suiteName + " Automation Execution Report");
+        sparkReporter.config().setDocumentTitle(suiteName + " " + Constants.EXTENT_REPORT_DOCUMENT_TITLE);
+        sparkReporter.config().setReportName(suiteName + " " + Constants.EXTENT_REPORT_NAME);
         extent = new ExtentReports();
         extent.attachReporter(sparkReporter);
         extent.setSystemInfo("OS", System.getProperty("os.name"));

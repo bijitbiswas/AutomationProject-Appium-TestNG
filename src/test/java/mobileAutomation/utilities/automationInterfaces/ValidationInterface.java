@@ -4,9 +4,13 @@ import org.openqa.selenium.WebElement;
 
 public interface ValidationInterface {
 
-    WebElement waitForElementToBeVisible(WebElement element);
+    void waitForElementToBeVisible(WebElement element);
 
-    WebElement waitForElementToBeVisible(WebElement element, int timeoutInSecs);
+    void waitForElementToBeVisible(WebElement element, int timeoutInSecs);
+
+    void waitForElementToBeInvisible(WebElement element);
+
+    void waitForElementToBeInvisible(WebElement element, int timeoutInSecs);
 
     boolean isElementVisible(WebElement element);
 
