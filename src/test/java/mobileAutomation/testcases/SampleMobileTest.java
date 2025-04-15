@@ -1,11 +1,13 @@
 package mobileAutomation.testcases;
 
 import mobileAutomation.pages.SampleMobilePage;
+import mobileAutomation.pages.SampleSignInPage;
 import mobileAutomation.utilities.DriverManager;
 import org.testng.annotations.Test;
 
 public class SampleMobileTest extends DriverManager{
 
+    SampleSignInPage signInPg;
     SampleMobilePage page;
 
     @Test(
@@ -16,9 +18,10 @@ public class SampleMobileTest extends DriverManager{
     public void addAndRemoveCartItem(String userName, String password) {
         System.out.println("Starting Sample Test");
 
+        signInPg = new SampleSignInPage(getDriverContext());
         page = new SampleMobilePage(getDriverContext());
 
-        page.login(userName, password);
+        signInPg.login(userName, password);
 
         page.addItemToCart();
 

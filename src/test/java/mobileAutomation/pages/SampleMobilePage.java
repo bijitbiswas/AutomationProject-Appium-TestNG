@@ -13,27 +13,6 @@ public class SampleMobilePage extends PageActionManager {
         super(context);
     }
 
-    @iOSXCUITFindBy(xpath = "")
-    @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='View menu']")
-    private WebElement menuBarButton;
-
-    @iOSXCUITFindBy(xpath = "")
-    @AndroidFindBy(xpath = "//android.widget.TextView[@content-desc='Login Menu Item']")
-    private WebElement loginMenuItem;
-
-    @iOSXCUITFindBy(xpath = "")
-    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/nameET')]")
-    private WebElement usernameField;
-
-    @iOSXCUITFindBy(xpath = "")
-    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/passwordET')]")
-    private WebElement passwordField;
-
-    @iOSXCUITFindBy(xpath = "")
-    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Tap to login with given credentials']")
-    private WebElement loginButton;
-
-
     @iOSXCUITFindBy(xpath = "//*[@value='Sauce Labs Backpack - Black']/preceding-sibling::XCUIElementTypeImage[@name='Product Image']")
     @AndroidFindBy(xpath = "//*[@text='Sauce Labs Backpack']/preceding-sibling::android.widget.ImageView[@content-desc='Product Image']")
     private WebElement sauceLabBackpackImage;
@@ -58,14 +37,6 @@ public class SampleMobilePage extends PageActionManager {
     private WebElement goToSiteButton;
 
 
-    public void login(String userName, String password) {
-        click(menuBarButton);
-        click(loginMenuItem);
-        type(usernameField, userName);
-        type(passwordField, password);
-        click(loginButton);
-        validateText("Products");
-    }
 
     public void addItemToCart() {
         String productName = "Sauce Labs Backpack";
