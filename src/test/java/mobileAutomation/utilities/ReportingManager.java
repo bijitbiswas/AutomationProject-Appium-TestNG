@@ -10,6 +10,7 @@ import com.aventstack.extentreports.model.Media;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import io.appium.java_client.AppiumDriver;
 import mobileAutomation.Constants;
+import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.testng.ITestContext;
@@ -19,7 +20,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ReportingManager {
+public class ReportingManager extends GeneralFunction {
 
     private static final String time = new SimpleDateFormat(Constants.EXTENT_REPORT_DATE_TIME_FORMAT).format(new Date());
     private final String reportFolderLocation = Constants.EXTENT_REPORT_FOLDER_WITH_PREFIX + time;
@@ -32,7 +33,7 @@ public class ReportingManager {
         String suiteName = context.getCurrentXmlTest().getSuite().getName();
         String reportPath = System.getProperty("user.dir") + "/" + reportFolderLocation + "/" +
                 suiteName + "_" + time + ".html";
-        System.out.println("=======Report will be generated at "+reportPath+"======");
+        println("Report will be generated at " + reportPath);
 
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
         sparkReporter.config().setDocumentTitle(suiteName + " " + Constants.EXTENT_REPORT_DOCUMENT_TITLE);
@@ -77,12 +78,12 @@ public class ReportingManager {
     }
 
     public String captureScreenshot(AppiumDriver mobileDriver, String screenshotName) {
-        String filename = screenshotName.replace("[^a-zA-Z0-9 ]", "") +".png";
+        String filename = screenshotName.replace("[^a-zA-Z0-9 ]", "") + ".png";
         try {
             File scrFile = mobileDriver.getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(scrFile, new File(reportFolderLocation + "/"+ filename));
+            FileUtils.copyFile(scrFile, new File(reportFolderLocation + "/" + filename));
         } catch (Exception e) {
-            System.out.println("Error copying screenshot to TestReport : " + e.getMessage());
+            println("Error copying screenshot to TestReport : " + e.getMessage());
             throw new RuntimeException(e);
         }
         return filename;

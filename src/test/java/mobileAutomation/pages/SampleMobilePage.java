@@ -5,7 +5,6 @@ import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.PageActionManager;
 import org.openqa.selenium.WebElement;
-import org.testng.Assert;
 
 public class SampleMobilePage extends PageActionManager {
 
@@ -13,72 +12,82 @@ public class SampleMobilePage extends PageActionManager {
         super(context);
     }
 
-    @iOSXCUITFindBy(xpath = "//*[@value='Sauce Labs Backpack - Black']/preceding-sibling::XCUIElementTypeImage[@name='Product Image']")
-    @AndroidFindBy(xpath = "//*[@text='Sauce Labs Backpack']/preceding-sibling::android.widget.ImageView[@content-desc='Product Image']")
-    private WebElement sauceLabBackpackImage;
+    @iOSXCUITFindBy(xpath = "//*[@value='%s']/preceding-sibling::XCUIElementTypeImage[@name='Product Image']")
+    @AndroidFindBy(xpath = "//*[@text='%s']/preceding-sibling::android.widget.ImageView[@content-desc='Product Image']")
+    private WebElement itemImage;
 
     @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Cart-tab-item']")
     @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='Displays number of items in your cart']")
     private WebElement cartBadge;
 
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeCell/XCUIElementTypeStaticText[1]")
-    @AndroidFindBy(id = "titleTV")
-    private WebElement productTitle;
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@value='Add To Cart']")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Tap to add product to cart']")
+    private WebElement addToCartButton;
 
     @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name='Remove Item']")
     @AndroidFindBy(accessibility = "Removes product from cart")
     private WebElement removeItemButton;
 
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField")
-    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'urlET')]")
-    private WebElement urlInputField;
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Confirms products for checkout']")
+    private WebElement checkOutButton;
 
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Go To Site']")
-    private WebElement goToSiteButton;
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/fullNameET')]")
+    private WebElement fullNameField;
+
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/address1ET')]")
+    private WebElement addressLine1;
+
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/cityET')]")
+    private WebElement city;
+
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/zipET')]")
+    private WebElement zipCode;
+
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/countryET')]")
+    private WebElement country;
+
+    @iOSXCUITFindBy(xpath = "")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Saves user info for checkout']")
+    private WebElement toPaymentButton;
 
 
 
-    public void addItemToCart() {
-        String productName = "Sauce Labs Backpack";
-        if (isPlatform("iOS")) {
-            productName = "Sauce Labs Backpack - Black";
-        }
-        sleep(3);
-        validateScreenVisible("LandingPage");
-        click(sauceLabBackpackImage);
-
-        if (isPlatform("Android")) {
-//            // Additionally selecting one more item for android app
-//            clickImage("AddMoreItemButton");
-            clickByText("Add to cart");
-        } else
-            clickByText("Add To Cart");
-        click(cartBadge);
-        validateElementText(productTitle, productName);
-        addSuccessLabelWithScreenshot("Item added to cart");
-    }
-
-    public void removeItemFromCart() {
-        click(removeItemButton);
-        validateText("No Items");
-        addSuccessLabel("Item removed from cart");
-    }
-
-    public void checkWebView() {
-        if (isPlatform("iOS")) {
-            clickByAccessibilityId("More-tab-item");
-            clickByAccessibilityId("Webview-menu-item");
-            Assert.assertTrue(isElementVisible(goToSiteButton));
-        } else {
-            clickById("menuIV");
-            clickByText("WebView");
-            Assert.assertTrue(isElementVisibleById("goBtn"));
-        }
-
-        type(urlInputField,"https://www.google.com");
+    public void addItemToCart(String itemName) {
+        swipeUpUntilVisible(itemImage, itemName);
+        click(itemImage, itemName);
+        click(addToCartButton);
         navigateBack();
-        sleep(5);
+        addSuccessLabel("Item "+itemName+" added to cart");
     }
 
+    public void viewCartAndVerifyItems(String... items) {
+        click(cartBadge);
+        waitForElementToBeVisible(removeItemButton, 3);
+        for (String item : items) {
+            validateText(item);
+        }
+        addSuccessLabelWithScreenshot("Items verified in cart");
+    }
 
+    public void removeItemFromCart(String itemName) {
+        String androidXpath = "//android.widget.TextView[@text='"+itemName+"']/../following-sibling::*[contains(@resource-id,'addToCartLL')]/*[@text='Remove Item']";
+
+        clickByXpath(androidXpath);
+    }
+
+    public void checkoutCart() {
+        click(checkOutButton);
+        type(fullNameField, "John Doe");
+        type(addressLine1, "123 Main St");
+        type(city, "New York");
+        type(zipCode, "10001");
+        type(country, "USA");
+        click(toPaymentButton);
+    }
 }

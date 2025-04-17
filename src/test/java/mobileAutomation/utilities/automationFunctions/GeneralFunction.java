@@ -21,4 +21,19 @@ public class GeneralFunction {
         }
         return elementName;
     }
+
+    String getDynamicElementLocator(WebElement element, String dynamicValue) {
+        String elementName = String.format(getElementName(element), dynamicValue);
+        return elementName.split(": ")[0].trim();
+    }
+
+    String getDynamicElementLocatorValue(WebElement element, String dynamicValue) {
+        String elementName = String.format(getElementName(element), dynamicValue);
+        return elementName.split(": ")[1].trim();
+    }
+
+    public void println(String message) {
+        System.out.println("========"+message+"========");
+    }
+
 }

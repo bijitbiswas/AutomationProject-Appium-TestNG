@@ -42,6 +42,14 @@ public class PageActionManager implements
         interactionInterface.click(element);
     }
 
+    public void click(WebElement element, String dynamicValue) {
+        interactionInterface.click(element, dynamicValue);
+    }
+
+    public void clickByXpath(String xpath) {
+        interactionInterface.clickByXpath(xpath);
+    }
+
     public void clickByText(String elementText) {
         interactionInterface.clickByText(elementText);
     }
@@ -58,6 +66,13 @@ public class PageActionManager implements
         interactionInterface.type(element, text);
     }
 
+    public void swipeUpUntilVisible(WebElement element) {
+        interactionInterface.swipeUpUntilVisible(element);
+    }
+
+    public void swipeUpUntilVisible(WebElement element, String dynamicValue) {
+        interactionInterface.swipeUpUntilVisible(element, dynamicValue);
+    }
 
 
     // ================== Validation Functions ==================
@@ -134,6 +149,14 @@ public class PageActionManager implements
 
     public void tapOnScreen(int xCoordinate, int yCoordinate) {
         mobileGeneralInterface.tapOnScreen(xCoordinate, yCoordinate);
+    }
+
+    public void swipeOnScreenWithCoordinate(int startX, int startY, int endX, int endY) {
+        mobileGeneralInterface.swipeOnScreenWithCoordinate(startX, startY, endX, endY);
+    }
+
+    public void swipeUp() {
+        mobileGeneralInterface.swipeUp();
     }
 
 

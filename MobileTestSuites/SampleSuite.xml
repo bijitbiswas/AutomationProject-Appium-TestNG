@@ -6,7 +6,7 @@
     <test name="TC_01 Sample mobile automation test"
           annotations="JDK" enabled="true" >
         <classes>
-            <class name="mobileAutomation.testcases.SampleMobileTest"/>
+            <class name="mobileAutomation.testcases.SampleMobileAndroidTest"/>
         </classes>
     </test>
 

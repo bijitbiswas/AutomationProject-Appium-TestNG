@@ -20,5 +20,6 @@ public final class Constants {
     public static final int IMAGE_SCALING_FACTOR = 1;
 
     public static final int SHORT_WAIT = 2;
+    public static final int SWIPE_RETRY_COUNT = 10;
 
 }

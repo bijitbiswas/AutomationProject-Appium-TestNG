@@ -5,6 +5,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import mobileAutomation.Constants;
+import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -17,7 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
-public class DriverManager {
+public class DriverManager extends GeneralFunction {
 
     private final ContextManager context = new ContextManager();
     private final ReportingManager report = new ReportingManager();
@@ -26,7 +27,7 @@ public class DriverManager {
 
     @BeforeSuite
     public void setupSuite(ITestContext context) {
-        System.out.println("=======Executing before suite======");
+        println("Executing before suite");
         configurationManager = new ConfigurationManager();
         serverManager = new ServerManager();
 
@@ -50,7 +51,7 @@ public class DriverManager {
 
     @BeforeMethod
     public void setupBeforeMethod(ITestResult result) {
-        System.out.println("=======Executing before method======");
+        println("Executing before method");
         context.extentTest = report.createTest(result);
     }
 
@@ -62,31 +63,29 @@ public class DriverManager {
 
     @AfterMethod
     public void addResultToRun(ITestResult result) {
-        System.out.println("=======Executing after method======");
+        println("Executing after method");
         report.updateStatusToReport(getDriverContext().mobileDriver, result);
     }
 
     @AfterClass(alwaysRun = true)
     public void quitDriver() {
-        System.out.println("========Closing Driver========");
+        println("Closing Driver");
         try {
             if (getDriverContext().mobileDriver != null) {
                 getDriverContext().mobileDriver.quit();
-                System.out.println("========Driver closed successfully========");
+                println("Driver closed successfully");
             } else
-                System.out.println("========Driver is not created or is already closed========");
-        }
-        finally {
+                println("Driver is not created or is already closed");
+        } finally {
             serverManager.stopServer();
         }
     }
 
     @AfterSuite(alwaysRun = true)
     public void tearDownSuite() {
-        System.out.println("=======Executing after suite======");
+        println("Executing after suite");
         report.closeExtentReport();
     }
-
 
 
     public ContextManager getDriverContext() {
@@ -94,7 +93,7 @@ public class DriverManager {
     }
 
     private AppiumDriver createAppiumDriver(AppiumDriverLocalService server) {
-        System.out.println("========Creating " + configurationManager.platformName +" Driver========");
+        println("Creating " + configurationManager.platformName + " Driver");
 
         URL driverURL = getServerURL(server);
 
@@ -106,7 +105,7 @@ public class DriverManager {
         else if (configurationManager.platformName.equals("iOS"))
             mobileDriver = new IOSDriver(driverURL, capabilities);
 
-        System.out.println("========Driver created successfully========");
+        println("Driver created successfully");
         return mobileDriver;
     }
 
@@ -142,7 +141,7 @@ public class DriverManager {
     }
 
     private DesiredCapabilities getIOSCapabilities() {
-        DesiredCapabilities capabilities =  configurationManager.iOSCapabilities;
+        DesiredCapabilities capabilities = configurationManager.iOSCapabilities;
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("automationName", "XCUITest");
         return capabilities;

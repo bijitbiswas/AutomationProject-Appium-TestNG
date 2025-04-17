@@ -6,9 +6,9 @@ import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.PageActionManager;
 import org.openqa.selenium.WebElement;
 
-public class SampleSignInPage extends PageActionManager {
+public class SampleLoginPage extends PageActionManager {
 
-    public SampleSignInPage(ContextManager context) {
+    public SampleLoginPage(ContextManager context) {
         super(context);
     }
 
@@ -34,6 +34,8 @@ public class SampleSignInPage extends PageActionManager {
 
 
     public void login(String userName, String password) {
+        sleep(3);
+        validateScreenVisible("LandingPage");
         click(menuBarButton);
         click(loginMenuItem);
         type(usernameField, userName);

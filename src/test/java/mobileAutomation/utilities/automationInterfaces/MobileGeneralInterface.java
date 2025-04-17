@@ -14,4 +14,9 @@ public interface MobileGeneralInterface {
 
     void tapOnScreen(int xCoordinate, int yCoordinate);
 
+    void swipeOnScreenWithCoordinate(int startX, int startY, int endX, int endY);
+
+    void swipeUp();
+
+
 }

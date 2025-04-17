@@ -4,6 +4,7 @@ import io.appium.java_client.AppiumDriver;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -13,7 +14,7 @@ import java.time.Duration;
 import java.util.List;
 
 
-public class MobileGeneralFunction implements MobileGeneralInterface {
+public class MobileGeneralFunction extends GeneralFunction implements MobileGeneralInterface {
 
     AppiumDriver mobileDriver;
     WebDriverWait wait;
@@ -33,7 +34,7 @@ public class MobileGeneralFunction implements MobileGeneralInterface {
     @Override
     public void navigateBack() {
         mobileDriver.navigate().back();
-        System.out.println("=======Navigated back in application=======");
+        println("Navigated back in application");
     }
 
     @Override
@@ -45,7 +46,7 @@ public class MobileGeneralFunction implements MobileGeneralInterface {
         } else {
             deviceName = mobileDriver.getCapabilities().getCapability("appium:deviceName").toString();
         }
-        System.out.println("=======Device name is : "+ deviceName +"======");
+        println("Device name is : " + deviceName);
         return deviceName;
     }
 
@@ -83,6 +84,33 @@ public class MobileGeneralFunction implements MobileGeneralInterface {
         mobileDriver.perform(List.of(tap));
         sleep(1);
 
-        System.out.println("=======Tapped on screen at coordinates: (" + xCoordinate + ", " + yCoordinate + ")=======");
+        println("Tapped on screen at coordinates: (" + xCoordinate + ", " + yCoordinate + ")");
     }
+
+    @Override
+    public void swipeOnScreenWithCoordinate(int startX, int startY, int endX, int endY) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger1");
+        Sequence swipe = new Sequence(finger, 1);
+
+        swipe.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), endX, endY));
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        sleep(1);
+        mobileDriver.perform(List.of(swipe));
+        sleep(1);
+        println("Swiped from coordinate (" + startX + "," + startY + ") to (" + endX + "," + endY + ")");
+    }
+
+    @Override
+    public void swipeUp() {
+        Dimension size = mobileDriver.manage().window().getSize();
+        int startY = (int) (size.height * 0.70);
+        int endY = (int) (size.height * 0.30);
+        int startX = (int) (size.width * 0.60);
+
+        swipeOnScreenWithCoordinate(startX, startY, startX, endY);
+    }
+
 }
