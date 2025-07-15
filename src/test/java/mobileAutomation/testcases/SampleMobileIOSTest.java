@@ -1,29 +1,28 @@
 package mobileAutomation.testcases;
 
-import mobileAutomation.pages.SampleMobilePage;
 import mobileAutomation.pages.SampleLoginPage;
+import mobileAutomation.pages.SampleMobilePage;
 import mobileAutomation.utilities.DriverManager;
 import org.testng.annotations.Test;
 
-public class SampleMobileAndroidTest extends DriverManager{
+public class SampleMobileIOSTest extends DriverManager{
 
     SampleLoginPage sampleLoginPg;
     SampleMobilePage sampleMobilePg;
 
-    private final String item1 = "Sauce Labs Backpack (violet)";
-    private final String item2 = "Sauce Labs Backpack (orange)";
+    private final String item1 = "Sauce Labs Backpack - Violet";
+    private final String item2 = "Sauce Labs Backpack - Orange";
 
     @Test(
             groups = {"Smoke", "Regression"},
-            dataProvider = "getTestData",
             description = "Login and add items to cart"
     )
-    public void addItemsToCart(String userName, String password) {
+    public void addItemsToCart() {
 
         sampleLoginPg = new SampleLoginPage(getDriverContext());
         sampleMobilePg = new SampleMobilePage(getDriverContext());
 
-        sampleLoginPg.login(userName, password);
+        sampleLoginPg.login(null, null);
 
         sampleMobilePg.addItemToCart(item1);
 

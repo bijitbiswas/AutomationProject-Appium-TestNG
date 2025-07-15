@@ -1,15 +1,18 @@
 package mobileAutomation.utilities.automationFunctions;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.KeyInput;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 import java.util.List;
 
@@ -35,6 +38,52 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
     public void navigateBack() {
         mobileDriver.navigate().back();
         println("Navigated back in application");
+    }
+
+    @Override
+    public void hideKeyboard() {
+        try {
+            if (mobileDriver instanceof IOSDriver) {
+                ((IOSDriver)mobileDriver).hideKeyboard();
+                pressCmdKIfIOSKeyboardDisplayed();
+            } else {
+                ((AndroidDriver)mobileDriver).hideKeyboard();
+            }
+        } catch (Exception e) {
+            println("Failed to hide keyboard");
+        }
+    }
+
+    private void pressCmdKIfIOSKeyboardDisplayed () {
+
+        if (mobileDriver instanceof IOSDriver) {
+
+//            new Actions(mobileDriver)
+//                    .keyDown(Keys.META)
+//                    .sendKeys("k")
+//                    .keyUp(Keys.META)
+//                    .perform();
+
+            KeyInput keyboard = new KeyInput("keyboard");
+            Sequence cmdK = new Sequence(keyboard, 0);
+
+            cmdK.addAction(keyboard.createKeyDown(Keys.COMMAND.getCodePoint()));
+            cmdK.addAction(keyboard.createKeyDown("k".codePointAt(0)));
+            cmdK.addAction(keyboard.createKeyUp("k".codePointAt(0)));
+            cmdK.addAction(keyboard.createKeyUp(Keys.COMMAND.getCodePoint()));
+
+            mobileDriver.perform(List.of(cmdK));
+
+//            try {
+//                ((IOSDriver) mobileDriver).executeScript("mobile: pressButton", Map.of("key", "cmd+k"));
+//                println("Pressed Cmd+K to hide keyboard");
+//            } catch (Exception e) {
+//                println("Failed to press Cmd+K");
+//                e.printStackTrace();
+//            }
+        } else {
+            println("Cmd+K is not supported on this platform");
+        }
     }
 
     @Override
@@ -108,6 +157,16 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
         Dimension size = mobileDriver.manage().window().getSize();
         int startY = (int) (size.height * 0.70);
         int endY = (int) (size.height * 0.30);
+        int startX = (int) (size.width * 0.60);
+
+        swipeOnScreenWithCoordinate(startX, startY, startX, endY);
+    }
+
+    @Override
+    public void swipeDown() {
+        Dimension size = mobileDriver.manage().window().getSize();
+        int startY = (int) (size.height * 0.30);
+        int endY = (int) (size.height * 0.70);
         int startX = (int) (size.width * 0.60);
 
         swipeOnScreenWithCoordinate(startX, startY, startX, endY);

@@ -131,6 +131,10 @@ public class PageActionManager implements
         mobileGeneralInterface.navigateBack();
     }
 
+    public void hideKeyboard() {
+        mobileGeneralInterface.hideKeyboard();
+    }
+
     public String getDeviceName() {
         return mobileGeneralInterface.getDeviceName();
     }
@@ -157,6 +161,10 @@ public class PageActionManager implements
 
     public void swipeUp() {
         mobileGeneralInterface.swipeUp();
+    }
+
+    public void swipeDown() {
+        mobileGeneralInterface.swipeDown();
     }
 
 

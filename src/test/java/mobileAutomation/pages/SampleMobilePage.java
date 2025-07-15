@@ -20,7 +20,7 @@ public class SampleMobilePage extends PageActionManager {
     @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='Displays number of items in your cart']")
     private WebElement cartBadge;
 
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@value='Add To Cart']")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='AddToCart']")
     @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Tap to add product to cart']")
     private WebElement addToCartButton;
 
@@ -28,41 +28,75 @@ public class SampleMobilePage extends PageActionManager {
     @AndroidFindBy(accessibility = "Removes product from cart")
     private WebElement removeItemButton;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='ProceedToCheckout']")
     @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Confirms products for checkout']")
     private WebElement checkOutButton;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Full Name')]/following::XCUIElementTypeTextField[1]")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/fullNameET')]")
     private WebElement fullNameField;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Address Line 1')]/following::XCUIElementTypeTextField[1]")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/address1ET')]")
     private WebElement addressLine1;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'City')]/following::XCUIElementTypeTextField[1]")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/cityET')]")
     private WebElement city;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Zip Code')]/following::XCUIElementTypeTextField[1]")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/zipET')]")
     private WebElement zipCode;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Country')]/following::XCUIElementTypeTextField[1]")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/countryET')]")
     private WebElement country;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='To Payment']")
     @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Saves user info for checkout']")
     private WebElement toPaymentButton;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Full Name')]/following::XCUIElementTypeTextField[1]")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/nameET')]")
+    private WebElement nameField;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Card Number')]/following::XCUIElementTypeTextField[1]")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/cardNumberET')]")
+    private WebElement cardNumberField;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Expiration Date')]/following::XCUIElementTypeTextField[1]")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/expirationDateET')]")
+    private WebElement expirationDateField;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Security Code')]/following::XCUIElementTypeTextField[1]")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'/securityCodeET')]")
+    private WebElement securityCodeField;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Review Order']")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Saves payment info and launches screen to review checkout data']")
+    private WebElement reviewOrderButton;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeImage[@name='BackButton Icons']/preceding-sibling::XCUIElementTypeButton")
+    private WebElement productBackButton;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Place Order']")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Completes the process of checkout']")
+    private WebElement placeOrderButton;
+
 
 
 
     public void addItemToCart(String itemName) {
+        swipeDown();
         swipeUpUntilVisible(itemImage, itemName);
         click(itemImage, itemName);
+        swipeUpUntilVisible(addToCartButton);
         click(addToCartButton);
-        navigateBack();
+        if (isPlatform("iOS")) {
+            click(productBackButton);
+        } else {
+            navigateBack();
+        }
         addSuccessLabel("Item "+itemName+" added to cart");
     }
 
@@ -77,17 +111,50 @@ public class SampleMobilePage extends PageActionManager {
 
     public void removeItemFromCart(String itemName) {
         String androidXpath = "//android.widget.TextView[@text='"+itemName+"']/../following-sibling::*[contains(@resource-id,'addToCartLL')]/*[@text='Remove Item']";
-
-        clickByXpath(androidXpath);
+        String iOSXpath = "//XCUIElementTypeStaticText[@name='"+itemName+"']/following-sibling::XCUIElementTypeButton[@name='Remove Item']";
+        String removeXpath = isPlatform("iOS") ? iOSXpath : androidXpath;
+        clickByXpath(removeXpath);
     }
 
     public void checkoutCart() {
+
         click(checkOutButton);
         type(fullNameField, "John Doe");
         type(addressLine1, "123 Main St");
+        hideKeyboard();
+        click(fullNameField);
         type(city, "New York");
+        click(fullNameField);
         type(zipCode, "10001");
+        click(fullNameField);
         type(country, "USA");
+        click(fullNameField);
         click(toPaymentButton);
+    }
+
+    public void enterPaymentDetails() {
+        type(nameField, "John Doe");
+        type(cardNumberField, "41111111111111111");
+        type(expirationDateField, "12/25");
+        type(securityCodeField, "123");
+        hideKeyboard();
+        click(reviewOrderButton);
+    }
+
+    public void verifyOrderDetailsAndPlaceOrder() {
+        validateText("John Doe");
+        validateText("123 Main St");
+        validateText("New York");
+        validateText("10001");
+        validateText("USA");
+
+        swipeUp();
+        validateText("4111 1111 1111 1111");
+        validateText("12/25");
+        validateText("Billing address is the same as shipping address");
+        click(placeOrderButton);
+
+        validateText("Checkout Complete");
+        validateText("Thank you for your order");
     }
 }

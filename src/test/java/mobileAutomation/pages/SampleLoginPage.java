@@ -7,30 +7,37 @@ import mobileAutomation.utilities.PageActionManager;
 import org.openqa.selenium.WebElement;
 
 public class SampleLoginPage extends PageActionManager {
-
+    ContextManager context;
     public SampleLoginPage(ContextManager context) {
+
         super(context);
+        this.context = context;
     }
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='More-tab-item']")
     @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='View menu']")
     private WebElement menuBarButton;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='Login Button']")
     @AndroidFindBy(xpath = "//android.widget.TextView[@content-desc='Login Menu Item']")
     private WebElement loginMenuItem;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/nameET')]")
     private WebElement usernameField;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField")
     @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/passwordET')]")
     private WebElement passwordField;
 
-    @iOSXCUITFindBy(xpath = "")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Login']")
     @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Tap to login with given credentials']")
     private WebElement loginButton;
+
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='bob@example.com']")
+    private WebElement bobExampleUser;
+
+
 
 
     public void login(String userName, String password) {
@@ -38,9 +45,15 @@ public class SampleLoginPage extends PageActionManager {
         validateScreenVisible("LandingPage");
         click(menuBarButton);
         click(loginMenuItem);
-        type(usernameField, userName);
-        type(passwordField, password);
+        if (userName != null && password != null) {
+            type(usernameField, userName);
+            type(passwordField, password);
+            hideKeyboard();
+        } else {
+            click(bobExampleUser);
+        }
         click(loginButton);
-        validateText("Products");
+        String title = isPlatform("iOS") ? "title" : "Products";
+        validateText(title);
     }
 }

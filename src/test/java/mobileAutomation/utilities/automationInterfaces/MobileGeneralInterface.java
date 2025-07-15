@@ -4,6 +4,8 @@ public interface MobileGeneralInterface {
 
     void navigateBack();
 
+    void hideKeyboard();
+
     String getDeviceName();
 
     String getPlatformName();
@@ -17,6 +19,8 @@ public interface MobileGeneralInterface {
     void swipeOnScreenWithCoordinate(int startX, int startY, int endX, int endY);
 
     void swipeUp();
+
+    void swipeDown();
 
 
 }
