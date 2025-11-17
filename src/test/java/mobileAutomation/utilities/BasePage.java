@@ -1,5 +1,6 @@
 package mobileAutomation.utilities;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.*;
@@ -8,32 +9,32 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
 // PageActionsManager is the main controller to send the context(driver, wait etc.) to the actual implementation
-public class PageActionManager implements
+public class BasePage implements
         InteractionInterface,
         ValidationInterface,
         MobileGeneralInterface,
-        ImageInterface,
-        ReportingInterface
-{
+        ImageInterface {
 
+    protected AppiumDriver mobileDriver;
     private final InteractionInterface interactionInterface;
     private final ValidationInterface validationInterface;
     private final MobileGeneralInterface mobileGeneralInterface;
     private final ImageInterface imageInterface;
-    private final ReportingInterface reportingInterface;
     private final Double MATCH_THRESHOLD = Constants.IMAGE_MATCH_THRESHOLD;
     private final int SCALING_FACTOR = Constants.IMAGE_SCALING_FACTOR;
 
-    public PageActionManager(ContextManager context) {
+    public BasePage() {
+
+        this.mobileDriver = DriverManager.getMobileDriver();
         // To initialize the page elements in a generic way
-        PageFactory.initElements(new AppiumFieldDecorator(context.mobileDriver), this);
+        PageFactory.initElements(new AppiumFieldDecorator(mobileDriver), this);
+
 
         // Below Interfaces will Delegate to the Implementation function
-        this.interactionInterface = new InteractionFunction(context);
-        this.validationInterface = new ValidationFunction(context);
-        this.mobileGeneralInterface = new MobileGeneralFunction(context);
-        this.imageInterface = new ImageFunction(context);
-        this.reportingInterface = new ReportingFunction(context);
+        this.interactionInterface = new InteractionFunction();
+        this.validationInterface = new ValidationFunction();
+        this.mobileGeneralInterface = new MobileGeneralFunction();
+        this.imageInterface = new ImageFunction();
     }
 
 
@@ -220,10 +221,10 @@ public class PageActionManager implements
 
     // ================== Reporting Functions ==================
     public void addSuccessLabelWithScreenshot(String labelName) {
-        reportingInterface.addSuccessLabelWithScreenshot(labelName);
+        ExtentReportManager.logPass(labelName);
     }
 
     public void addSuccessLabel(String labelName) {
-        reportingInterface.addSuccessLabel(labelName);
+        ExtentReportManager.logPassWithScreenshot(labelName);
     }
 }

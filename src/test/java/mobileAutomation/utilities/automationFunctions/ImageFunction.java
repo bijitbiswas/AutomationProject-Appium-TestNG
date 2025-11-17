@@ -6,7 +6,7 @@ import io.appium.java_client.imagecomparison.OccurrenceMatchingResult;
 import io.appium.java_client.imagecomparison.SimilarityMatchingOptions;
 import io.appium.java_client.imagecomparison.SimilarityMatchingResult;
 import mobileAutomation.Constants;
-import mobileAutomation.utilities.ContextManager;
+import mobileAutomation.utilities.DriverManager;
 import mobileAutomation.utilities.Region;
 import mobileAutomation.utilities.automationInterfaces.ImageInterface;
 import org.apache.commons.io.FileUtils;
@@ -29,16 +29,12 @@ public class ImageFunction extends GeneralFunction implements ImageInterface {
     AppiumDriver mobileDriver;
     WebDriverWait wait;
     FluentWait<AppiumDriver> fluentWait;
-    ContextManager context;
-    private final String platformName;
     String dateTimeStamp = getCurrentDateTimeStamp();
 
-    public ImageFunction(ContextManager context) {
-        this.context = context;
-        this.mobileDriver = context.mobileDriver;
-        this.wait = context.wait;
-        this.fluentWait = context.fluentWait;
-        this.platformName = context.platformName;
+    public ImageFunction() {
+        this.mobileDriver = DriverManager.getMobileDriver();
+        this.wait = DriverManager.getMobileWait();
+        this.fluentWait = DriverManager.getMobileFluentWait();
     }
 
     @Override
@@ -68,7 +64,7 @@ public class ImageFunction extends GeneralFunction implements ImageInterface {
     @Override
     public void clickImage(String imageName, Double matchThreshold, int scalingFactor) {
         Region result = getVisualImageRegion(imageName, matchThreshold, scalingFactor);
-        new MobileGeneralFunction(context).tapOnScreen(result.getCenterX(), result.getCenterY());
+        new MobileGeneralFunction().tapOnScreen(result.getCenterX(), result.getCenterY());
         println("Clicked visual search of image name : BASELINE_" + imageName);
     }
 
@@ -95,11 +91,12 @@ public class ImageFunction extends GeneralFunction implements ImageInterface {
 
 
     private OccurrenceMatchingResult findImageOccurrence(String imageName, Double matchThreshold) throws IOException {
-        new MobileGeneralFunction(context).sleep(2);
+        new MobileGeneralFunction().sleep(2);
 
         // Get the execution device name and replace spaces with empty string
-        String executionDeviceName = new MobileGeneralFunction(context).getDeviceName()
+        String executionDeviceName = new MobileGeneralFunction().getDeviceName()
                 .replace(" ", "");
+        String platformName = new MobileGeneralFunction().getPlatformName();
         String imageLocation = (Constants.IMAGE_LOCATOR_PATH + platformName + "/BASELINE_") + imageName
                 + "_" + executionDeviceName + ".png";
         File imageFile = getImageFile(imageLocation);
@@ -139,11 +136,12 @@ public class ImageFunction extends GeneralFunction implements ImageInterface {
     }
 
     private boolean isScreenVisible(String screenName, Double matchThreshold) {
-        new MobileGeneralFunction(context).sleep(2);
+        new MobileGeneralFunction().sleep(2);
 
         // Get the execution device name and replace spaces with empty string
-        String executionDeviceName = new MobileGeneralFunction(context).getDeviceName()
+        String executionDeviceName = new MobileGeneralFunction().getDeviceName()
                 .replace(" ", "");
+        String platformName = new MobileGeneralFunction().getPlatformName();
         String imageLocation = (Constants.IMAGE_LOCATOR_PATH + platformName + "/BASELINE_") + screenName
                 + "_" + executionDeviceName + ".png";
         File imageFile = getImageFile(imageLocation);

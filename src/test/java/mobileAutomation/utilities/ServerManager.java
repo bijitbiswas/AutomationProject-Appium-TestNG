@@ -15,31 +15,37 @@ import java.time.Duration;
 
 public class ServerManager extends GeneralFunction {
 
-    private AppiumDriverLocalService server;
+    private static final ThreadLocal<AppiumDriverLocalService> service = new ThreadLocal<>();
 
-    public AppiumDriverLocalService startServer() {
-        println("Starting Appium Server");
-        server = getAppiumDriverService();
-        server.start();
-        if (!server.isRunning()) {
-            throw new AppiumServerHasNotBeenStartedLocallyException("Appium server not started. ABORT!!!");
+
+    public static void startServer() {
+        if (service.get() == null) {
+            println("Starting Appium Server");
+            AppiumDriverLocalService localService = getAppiumDriverService();
+            localService.start();
+            if (!localService.isRunning()) {
+                throw new AppiumServerHasNotBeenStartedLocallyException("Appium server not started. ABORT!!!");
+            }
+
+            service.set(localService);
+            println("Appium Server started on: " + localService.getUrl());
         }
-        // Comment below line if you want to see server logs in the console
-        server.clearOutPutStreams();
-        println("Appium Server Started");
-        return server;
     }
 
-    public void stopServer() {
-        println("Stopping Appium Server");
-        if (server.isRunning()) {
-            server.stop();
-            println("Appium Server Stopped");
-        } else
-            println("Appium Server not started or is already stopped");
+    public static AppiumDriverLocalService getServer() {
+        return service.get();
     }
 
-    private AppiumDriverLocalService getAppiumDriverService() {
+    public static void stopServer() {
+        if (service.get() != null) {
+            println("Stopping Appium Server");
+            getServer().stop();
+            println("Appium Server stopped");
+            service.remove();
+        }
+    }
+
+    private static AppiumDriverLocalService getAppiumDriverService() {
         // Run command "appium plugin install images" to install images plugin
         return AppiumDriverLocalService.buildService(new AppiumServiceBuilder()
                 .usingAnyFreePort()
@@ -49,7 +55,7 @@ public class ServerManager extends GeneralFunction {
                 .withLogFile(new File(createAppiumServerDirectory() + File.separator + "AppiumServer.log")));
     }
 
-    private String createAppiumServerDirectory() {
+    private static String createAppiumServerDirectory() {
         Path path = Paths.get("logs");
         try {
             if (!Files.exists(path)) {

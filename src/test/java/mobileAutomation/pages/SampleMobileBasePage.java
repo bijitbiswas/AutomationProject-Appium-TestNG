@@ -2,15 +2,10 @@ package mobileAutomation.pages;
 
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
-import mobileAutomation.utilities.ContextManager;
-import mobileAutomation.utilities.PageActionManager;
+import mobileAutomation.utilities.BasePage;
 import org.openqa.selenium.WebElement;
 
-public class SampleMobilePage extends PageActionManager {
-
-    public SampleMobilePage(ContextManager context) {
-        super(context);
-    }
+public class SampleMobileBasePage extends BasePage {
 
     @iOSXCUITFindBy(xpath = "//*[@value='%s']/preceding-sibling::XCUIElementTypeImage[@name='Product Image']")
     @AndroidFindBy(xpath = "//*[@text='%s']/preceding-sibling::android.widget.ImageView[@content-desc='Product Image']")
@@ -125,10 +120,13 @@ public class SampleMobilePage extends PageActionManager {
         click(fullNameField);
         type(city, "New York");
         click(fullNameField);
+        hideKeyboard();
         type(zipCode, "10001");
         click(fullNameField);
+        hideKeyboard();
         type(country, "USA");
         click(fullNameField);
+        hideKeyboard();
         click(toPaymentButton);
     }
 

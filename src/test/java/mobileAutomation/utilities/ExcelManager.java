@@ -10,9 +10,9 @@ import java.io.IOException;
 
 public class ExcelManager {
 
-    private XSSFSheet excelWSheet = null;
+    private static XSSFSheet excelWSheet = null;
 
-    public String[][] getMethodData(String methodName) {
+    public static String[][] getMethodData(String methodName) {
 
         FileInputStream excelFile;
         XSSFWorkbook excelWBook;
@@ -31,7 +31,7 @@ public class ExcelManager {
         return getTableArray(testMethodRowNumber);
     }
 
-    private int getMethodRowNumber(String testMethodName) {
+    private static int getMethodRowNumber(String testMethodName) {
         int lastRowCount = excelWSheet.getLastRowNum();
         int testCaseRow = 0;
         int i = 1;
@@ -46,7 +46,7 @@ public class ExcelManager {
         return testCaseRow;
     }
 
-    private String[][] getTableArray(int testMethodRowNumber) {
+    private static String[][] getTableArray(int testMethodRowNumber) {
 
         int totalCols;
         try {
@@ -73,7 +73,7 @@ public class ExcelManager {
         return tabArray;
     }
 
-    private String getCellData(int rowNumber, int columnNumber) {
+    private static String getCellData(int rowNumber, int columnNumber) {
         XSSFCell cell = excelWSheet.getRow(rowNumber).getCell(columnNumber);
 
         if (cell == null) return "";

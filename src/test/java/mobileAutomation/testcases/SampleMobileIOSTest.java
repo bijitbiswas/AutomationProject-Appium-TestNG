@@ -1,14 +1,15 @@
 package mobileAutomation.testcases;
 
-import mobileAutomation.pages.SampleLoginPage;
-import mobileAutomation.pages.SampleMobilePage;
+import mobileAutomation.pages.SampleLoginBasePage;
+import mobileAutomation.pages.SampleMobileBasePage;
+import mobileAutomation.utilities.BaseTest;
 import mobileAutomation.utilities.DriverManager;
 import org.testng.annotations.Test;
 
-public class SampleMobileIOSTest extends DriverManager{
+public class SampleMobileIOSTest extends BaseTest {
 
-    SampleLoginPage sampleLoginPg;
-    SampleMobilePage sampleMobilePg;
+    SampleLoginBasePage sampleLoginPg;
+    SampleMobileBasePage sampleMobilePg;
 
     private final String item1 = "Sauce Labs Backpack - Violet";
     private final String item2 = "Sauce Labs Backpack - Orange";
@@ -19,8 +20,8 @@ public class SampleMobileIOSTest extends DriverManager{
     )
     public void addItemsToCart() {
 
-        sampleLoginPg = new SampleLoginPage(getDriverContext());
-        sampleMobilePg = new SampleMobilePage(getDriverContext());
+        sampleLoginPg = new SampleLoginBasePage();
+        sampleMobilePg = new SampleMobileBasePage();
 
         sampleLoginPg.login(null, null);
 

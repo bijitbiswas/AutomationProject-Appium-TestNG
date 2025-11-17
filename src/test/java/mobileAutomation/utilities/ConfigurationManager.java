@@ -6,6 +6,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
@@ -18,11 +19,15 @@ public class ConfigurationManager extends GeneralFunction {
 
     static Properties properties;
     final public String driverName = getDriverName();
-    final public String platformName = getPlatformName();
+    final Long waitTime = getWaitTime();
     final DesiredCapabilities androidCapabilities = loadCapabilities("AndroidCapabilities");
     final DesiredCapabilities iOSCapabilities = loadCapabilities("iOSCapabilities");
+    final HashMap<String, Object> lambdaTestCapabilities = loadLambdaTestCapabilities();
     final DesiredCapabilities browserstackCapabilities = loadBrowserstackCapabilities();
-    final Long waitTime = getWaitTime();
+    public String testcaseName;
+    final String lambdaTestAuth = getLambdaTestAuth();
+    public ArrayList<String> lambdaTestMediaIds;
+
 
     /**
      * Below methods are the supporting methods to load the configuration from config.properties file
@@ -44,14 +49,6 @@ public class ConfigurationManager extends GeneralFunction {
     private String getDriverName() {
         assert properties != null;
         return properties.getProperty("DriverName");
-    }
-
-    private String getPlatformName() {
-        if (driverName.contains("Browserstack")) {
-            assert properties != null;
-            return properties.getProperty("PlatformName");
-        } else
-            return driverName;
     }
 
     private Long getWaitTime() {
@@ -84,24 +81,43 @@ public class ConfigurationManager extends GeneralFunction {
 
             for (String key : jsonObject.keySet()) {
                 Object keyValue = jsonObject.get(key);
-                if (Objects.equals(key, "userName") || Objects.equals(key, "accessKey") ||
-                        Objects.equals(key, "buildName") || Objects.equals(key, "projectName")) {
-                    if (key.equals("buildName") && keyValue.toString().isEmpty()) {
-                        keyValue = "Appium Build";
-                    }
+                if (Objects.equals(key, "userName") || Objects.equals(key, "accessKey")) {
                     bsOptions.put(key, keyValue);
                 } else
                     capabilities.setCapability(key, keyValue);
             }
-            bsOptions.put("appiumVersion", "2.6.0");
-            capabilities.setCapability("locale", "en_US");
-            capabilities.setCapability("autoGrantPermissions", true);
-            capabilities.setCapability("gpsEnabled", true);
-            capabilities.setCapability("browserstack.idleTimeout", 160);
-            capabilities.setCapability("browserstack.timezone", "Los_Angeles");
+            bsOptions.put("appiumVersion", "2.19.0");
+            capabilities.setCapability("appium:locale", "en_US");
+            capabilities.setCapability("appium:autoGrantPermissions", true);
+            capabilities.setCapability("appium:gpsEnabled", true);
+            capabilities.setCapability("appium:browserstack.idleTimeout", 160);
+            capabilities.setCapability("appium:browserstack.timezone", "Los_Angeles");
+            capabilities.setCapability("appium:interactiveDebugging", true);
             capabilities.setCapability("bstack:options", bsOptions);
         }
         return capabilities;
+    }
+
+    private HashMap<String, Object> loadLambdaTestCapabilities() {
+        String lambdaTestCapabilities = properties.getProperty("LambdaTestCapabilities");
+        JSONObject jsonObject = new JSONObject(lambdaTestCapabilities);
+
+        HashMap<String, Object> capabilitiesMap = new HashMap<>();
+        for (String key : jsonObject.keySet()) {
+            Object keyValue = jsonObject.get(key);
+            if (!Objects.equals(key, "userName") && !Objects.equals(key, "accessKey")) {
+                capabilitiesMap.put(key, keyValue.toString());
+            }
+        }
+        return capabilitiesMap;
+    }
+
+    private String getLambdaTestAuth() {
+        String lambdaTestCapabilities = properties.getProperty("LambdaTestCapabilities");
+        JSONObject jsonObject = new JSONObject(lambdaTestCapabilities);
+        String userName = jsonObject.getString("userName");
+        String accessKey = jsonObject.getString("accessKey");
+        return userName + ":" + accessKey;
     }
 
 }

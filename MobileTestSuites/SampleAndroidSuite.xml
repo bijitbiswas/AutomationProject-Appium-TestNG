@@ -9,5 +9,11 @@
             <class name="mobileAutomation.testcases.SampleMobileAndroidTest"/>
         </classes>
     </test>
+    <test name="TC_02 Sample mobile automation test parallel"
+          annotations="JDK" enabled="true" >
+        <classes>
+            <class name="mobileAutomation.testcases.SampleMobileParallelCheckTest"/>
+        </classes>
+    </test>
 
 </suite>

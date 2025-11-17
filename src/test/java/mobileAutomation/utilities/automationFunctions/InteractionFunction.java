@@ -3,7 +3,7 @@ package mobileAutomation.utilities.automationFunctions;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import mobileAutomation.Constants;
-import mobileAutomation.utilities.ContextManager;
+import mobileAutomation.utilities.DriverManager;
 import mobileAutomation.utilities.automationInterfaces.InteractionInterface;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -14,17 +14,17 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class InteractionFunction extends GeneralFunction implements InteractionInterface {
 
-    ContextManager context;
     AppiumDriver mobileDriver;
     WebDriverWait wait;
     FluentWait<AppiumDriver> fluentWait;
+    String driverName;
     GeneralFunction generalFunction = new GeneralFunction();
 
-    public InteractionFunction(ContextManager context) {
-        this.context = context;
-        this.mobileDriver = context.mobileDriver;
-        this.wait = context.wait;
-        this.fluentWait = context.fluentWait;
+    public InteractionFunction() {
+        this.mobileDriver = DriverManager.getMobileDriver();
+        this.wait = DriverManager.getMobileWait();
+        this.fluentWait = DriverManager.getMobileFluentWait();
+        this.driverName = DriverManager.getDriverName();
     }
 
     private By getBy(String locatorType, String locatorValue) {
@@ -155,8 +155,8 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
     @Override
     public void swipeUpUntilVisible(WebElement element) {
         for (int i = 0; i <= Constants.SWIPE_RETRY_COUNT; i++) {
-            if (!new ValidationFunction(context).isElementVisible(element)) {
-                new MobileGeneralFunction(context).swipeUp();
+            if (!new ValidationFunction().isElementVisible(element)) {
+                new MobileGeneralFunction().swipeUp();
             } else {
                 break;
             }
@@ -170,7 +170,7 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
 
         for (int i = 0; i <= Constants.SWIPE_RETRY_COUNT; i++) {
             if (!isVisible(locator, locatorValue)) {
-                new MobileGeneralFunction(context).swipeUp();
+                new MobileGeneralFunction().swipeUp();
             } else {
                 break;
             }
@@ -178,7 +178,7 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
     }
 
     private boolean isVisible(String locator, String locatorValue) {
-        ValidationFunction validationFunction = new ValidationFunction(context);
+        ValidationFunction validationFunction = new ValidationFunction();
         return switch (locator.toLowerCase()) {
             case "xpath" -> validationFunction.isElementVisibleByXpath(locatorValue);
             case "id" -> validationFunction.isElementVisibleById(locatorValue);

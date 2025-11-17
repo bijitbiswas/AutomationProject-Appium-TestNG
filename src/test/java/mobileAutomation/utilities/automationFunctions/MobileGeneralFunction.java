@@ -3,7 +3,8 @@ package mobileAutomation.utilities.automationFunctions;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import mobileAutomation.utilities.ContextManager;
+import mobileAutomation.Constants;
+import mobileAutomation.utilities.DriverManager;
 import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
@@ -22,15 +23,13 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
     AppiumDriver mobileDriver;
     WebDriverWait wait;
     FluentWait<AppiumDriver> fluentWait;
-    private final String platformName;
     private final String driverName;
 
-    public MobileGeneralFunction(ContextManager context) {
-        this.mobileDriver = context.mobileDriver;
-        this.wait = context.wait;
-        this.fluentWait = context.fluentWait;
-        this.driverName = context.driverName;
-        this.platformName = context.platformName;
+    public MobileGeneralFunction() {
+        this.mobileDriver = DriverManager.getMobileDriver();
+        this.wait = DriverManager.getMobileWait();
+        this.fluentWait = DriverManager.getMobileFluentWait();
+        this.driverName = DriverManager.getDriverName();
     }
 
 
@@ -89,9 +88,11 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
     @Override
     public String getDeviceName() {
         String deviceName;
-        if (driverName.equalsIgnoreCase("BrowserStack")) {
+        if (driverName.contains(Constants.BROWSERSTACK)) {
             String response = mobileDriver.executeScript("browserstack_executor: {\"action\": \"getSessionDetails\"}").toString();
             deviceName = new JSONObject(response).get("device").toString();
+        }if (driverName.contains(Constants.LAMBDATEST)) {
+            deviceName = mobileDriver.getCapabilities().getCapability("appium:deviceModel").toString();
         } else {
             deviceName = mobileDriver.getCapabilities().getCapability("appium:deviceName").toString();
         }
@@ -101,7 +102,7 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
 
     @Override
     public String getPlatformName() {
-        return platformName;
+        return driverName.contains("-")? driverName.split("-")[1] : driverName;
     }
 
     @Override

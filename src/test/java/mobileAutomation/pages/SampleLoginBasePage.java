@@ -2,17 +2,10 @@ package mobileAutomation.pages;
 
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
-import mobileAutomation.utilities.ContextManager;
-import mobileAutomation.utilities.PageActionManager;
+import mobileAutomation.utilities.BasePage;
 import org.openqa.selenium.WebElement;
 
-public class SampleLoginPage extends PageActionManager {
-    ContextManager context;
-    public SampleLoginPage(ContextManager context) {
-
-        super(context);
-        this.context = context;
-    }
+public class SampleLoginBasePage extends BasePage {
 
     @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='More-tab-item']")
     @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='View menu']")

@@ -1,14 +1,16 @@
 package mobileAutomation.testcases;
 
-import mobileAutomation.pages.SampleMobilePage;
-import mobileAutomation.pages.SampleLoginPage;
+import mobileAutomation.pages.SampleMobileBasePage;
+import mobileAutomation.pages.SampleLoginBasePage;
+import mobileAutomation.utilities.BaseTest;
 import mobileAutomation.utilities.DriverManager;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class SampleMobileAndroidTest extends DriverManager{
+public class SampleMobileAndroidTest extends BaseTest {
 
-    SampleLoginPage sampleLoginPg;
-    SampleMobilePage sampleMobilePg;
+    SampleLoginBasePage sampleLoginPg;
+    SampleMobileBasePage sampleMobilePg;
 
     private final String item1 = "Sauce Labs Backpack (violet)";
     private final String item2 = "Sauce Labs Backpack (orange)";
@@ -20,8 +22,8 @@ public class SampleMobileAndroidTest extends DriverManager{
     )
     public void addItemsToCart(String userName, String password) {
 
-        sampleLoginPg = new SampleLoginPage(getDriverContext());
-        sampleMobilePg = new SampleMobilePage(getDriverContext());
+        sampleLoginPg = new SampleLoginBasePage();
+        sampleMobilePg = new SampleMobileBasePage();
 
         sampleLoginPg.login(userName, password);
 

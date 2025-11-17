@@ -32,7 +32,7 @@ public class GeneralFunction {
         return elementName.split(": ")[1].trim();
     }
 
-    public void println(String message) {
+    public static void println(String message) {
         System.out.println("========"+message+"========");
     }
 
