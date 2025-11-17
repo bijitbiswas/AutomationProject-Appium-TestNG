@@ -3,22 +3,18 @@ package mobileAutomation.utilities;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.service.local.AppiumDriverLocalService;
 import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.annotations.*;
-
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DriverManager extends GeneralFunction {
     private static String driverName;
@@ -77,9 +73,11 @@ public class DriverManager extends GeneralFunction {
     }
 
     public static void quitDriver(boolean testPassed) {
-        // Mark test status on LambdaTest if applicable
+        // Mark test status on LambdaTest/BrowserStack
         if (driverName.contains(Constants.LAMBDATEST)) {
             LambdaTestManager.markLambdaTestStatus(getMobileDriver(), testPassed);
+        } else if (driverName.contains(Constants.BROWSERSTACK)) {
+            BrowserStackManager.markBrowserStackStatus(getMobileDriver(), testPassed);
         }
 
         // Quit the mobile driver
@@ -112,8 +110,8 @@ public class DriverManager extends GeneralFunction {
         String lambdaTestURL = "https://" + lambdaTestAuth + Constants.LAMBDATEST_GRID_URL;
         URL gridUrl;
         try {
-            gridUrl = new URL(lambdaTestURL);
-        } catch (MalformedURLException e) {
+            gridUrl = URI.create(lambdaTestURL).toURL();
+        } catch (IllegalArgumentException | MalformedURLException e) {
             throw new RuntimeException("Invalid LambdaTest URL", e);
         }
 
@@ -130,8 +128,8 @@ public class DriverManager extends GeneralFunction {
 
         URL gridUrl;
         try {
-            gridUrl = new URL(Constants.BROWSERSTACK_URL);
-        } catch (MalformedURLException e) {
+            gridUrl = URI.create(Constants.BROWSERSTACK_URL).toURL();
+        } catch (IllegalArgumentException | MalformedURLException e) {
             throw new RuntimeException("Invalid Browserstack URL", e);
         }
 
@@ -166,11 +164,39 @@ public class DriverManager extends GeneralFunction {
     }
 
     private static DesiredCapabilities getBrowserstackCapabilities(ConfigurationManager configurationManager) {
-        DesiredCapabilities capabilities = configurationManager.browserstackCapabilities;
+
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        HashMap<String, Object> browserstackOptions = configurationManager.browserstackCapabilities;
+        String testcaseName = configurationManager.testcaseName;
+
         if (configurationManager.driverName.equalsIgnoreCase(Constants.BROWSERSTACK_ANDROID))
             capabilities.setCapability("platformName", "android");
         else if (configurationManager.driverName.equalsIgnoreCase(Constants.BROWSERSTACK_IOS))
             capabilities.setCapability("platformName", "iOS");
+        else {
+            throw new IllegalArgumentException("Unsupported Browserstack platform: " + configurationManager.driverName);
+        }
+
+        for (Map.Entry<String, Object> entry : browserstackOptions.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if(key.equals("bstack:options")) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> bsOptions = (Map<String, Object>) value;
+                assert bsOptions != null;
+                bsOptions.put("sessionName", testcaseName);
+                bsOptions.put("appiumVersion", "2.19.0");
+                capabilities.setCapability(key, bsOptions);
+            } else
+                capabilities.setCapability(key, value);
+        }
+        capabilities.setCapability("appium:locale", "en_US");
+        capabilities.setCapability("appium:autoGrantPermissions", true);
+        capabilities.setCapability("appium:gpsEnabled", true);
+        capabilities.setCapability("appium:browserstack.idleTimeout", 160);
+        capabilities.setCapability("appium:browserstack.timezone", "Los_Angeles");
+        capabilities.setCapability("appium:interactiveDebugging", true);
         return capabilities;
     }
 
@@ -208,7 +234,7 @@ public class DriverManager extends GeneralFunction {
     private static FluentWait<AppiumDriver> createFluentWait(Long waitTimeInSecs) {
         return new FluentWait<>(getMobileDriver())
                 .withTimeout(Duration.ofSeconds(waitTimeInSecs))
-                .pollingEvery(Duration.ofSeconds(1));
+                .pollingEvery(Duration.ofSeconds(Constants.FLUENT_WAIT_POLLING_TIME_IN_SECS));
     }
 
     private static WebDriverWait createWebDriverWait(Long waitTimeInSecs) {

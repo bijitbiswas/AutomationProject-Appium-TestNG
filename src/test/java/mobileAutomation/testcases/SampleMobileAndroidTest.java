@@ -3,8 +3,6 @@ package mobileAutomation.testcases;
 import mobileAutomation.pages.SampleMobileBasePage;
 import mobileAutomation.pages.SampleLoginBasePage;
 import mobileAutomation.utilities.BaseTest;
-import mobileAutomation.utilities.DriverManager;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class SampleMobileAndroidTest extends BaseTest {

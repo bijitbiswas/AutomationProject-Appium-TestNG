@@ -3,7 +3,6 @@ package mobileAutomation.testcases;
 import mobileAutomation.pages.SampleLoginBasePage;
 import mobileAutomation.pages.SampleMobileBasePage;
 import mobileAutomation.utilities.BaseTest;
-import mobileAutomation.utilities.DriverManager;
 import org.testng.annotations.Test;
 
 public class SampleMobileIOSTest extends BaseTest {

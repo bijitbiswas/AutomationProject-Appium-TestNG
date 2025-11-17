@@ -14,8 +14,10 @@ import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 
 public class MobileGeneralFunction extends GeneralFunction implements MobileGeneralInterface {
@@ -43,17 +45,17 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
     public void hideKeyboard() {
         try {
             if (mobileDriver instanceof IOSDriver) {
-                ((IOSDriver)mobileDriver).hideKeyboard();
+                ((IOSDriver) mobileDriver).hideKeyboard();
                 pressCmdKIfIOSKeyboardDisplayed();
             } else {
-                ((AndroidDriver)mobileDriver).hideKeyboard();
+                ((AndroidDriver) mobileDriver).hideKeyboard();
             }
         } catch (Exception e) {
             println("Failed to hide keyboard");
         }
     }
 
-    private void pressCmdKIfIOSKeyboardDisplayed () {
+    private void pressCmdKIfIOSKeyboardDisplayed() {
 
         if (mobileDriver instanceof IOSDriver) {
 
@@ -90,11 +92,11 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
         String deviceName;
         if (driverName.contains(Constants.BROWSERSTACK)) {
             String response = mobileDriver.executeScript("browserstack_executor: {\"action\": \"getSessionDetails\"}").toString();
-            deviceName = new JSONObject(response).get("device").toString();
-        }if (driverName.contains(Constants.LAMBDATEST)) {
-            deviceName = mobileDriver.getCapabilities().getCapability("appium:deviceModel").toString();
+            deviceName = new JSONObject(response).getString("device");
+        } else if (driverName.contains(Constants.LAMBDATEST)) {
+            deviceName = Objects.requireNonNull(mobileDriver.getCapabilities().getCapability("appium:deviceModel")).toString();
         } else {
-            deviceName = mobileDriver.getCapabilities().getCapability("appium:deviceName").toString();
+            deviceName = Objects.requireNonNull(mobileDriver.getCapabilities().getCapability("appium:deviceName")).toString();
         }
         println("Device name is : " + deviceName);
         return deviceName;
@@ -102,7 +104,7 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
 
     @Override
     public String getPlatformName() {
-        return driverName.contains("-")? driverName.split("-")[1] : driverName;
+        return driverName.contains("-") ? driverName.split("-")[1] : driverName;
     }
 
     @Override

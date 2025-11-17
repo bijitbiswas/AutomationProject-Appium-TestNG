@@ -10,33 +10,32 @@ import java.io.IOException;
 
 public class ExcelManager {
 
-    private static XSSFSheet excelWSheet = null;
-
     public static String[][] getMethodData(String methodName) {
 
-        FileInputStream excelFile;
-        XSSFWorkbook excelWBook;
-        try {
-            excelFile = new FileInputStream(Constants.TEST_DATA_EXCEL_PATH);
-            excelWBook = new XSSFWorkbook(excelFile);
+        try (FileInputStream excelFile = new FileInputStream(Constants.TEST_DATA_EXCEL_PATH);
+             XSSFWorkbook excelWBook = new XSSFWorkbook(excelFile)) {
+
+            XSSFSheet excelWSheet = excelWBook.getSheet(Constants.TEST_DATA_EXCEL_SHEET_NAME);
+            if (excelWSheet == null) {
+                throw new RuntimeException("Sheet not found: " + Constants.TEST_DATA_EXCEL_SHEET_NAME);
+            }
+
+            /* If the test method name is not found in the first column,
+             * testMethodRowNumber will be 0
+             * */
+            int testMethodRowNumber = getMethodRowNumber(excelWSheet, methodName);
+            return getTableArray(excelWSheet, testMethodRowNumber);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        excelWSheet = excelWBook.getSheet(Constants.TEST_DATA_EXCEL_SHEET_NAME);
-
-        /* If the test method name is not found in the first column,
-         * testMethodRowNumber will be 0
-         * */
-        int testMethodRowNumber = getMethodRowNumber(methodName);
-        return getTableArray(testMethodRowNumber);
     }
 
-    private static int getMethodRowNumber(String testMethodName) {
+    private static int getMethodRowNumber(XSSFSheet excelWSheet, String testMethodName) {
         int lastRowCount = excelWSheet.getLastRowNum();
         int testCaseRow = 0;
         int i = 1;
         while (i <= lastRowCount) {
-            String getMethodCellData = getCellData(i, 0);
+            String getMethodCellData = getCellData(excelWSheet, i, 0);
             if (getMethodCellData.equalsIgnoreCase(testMethodName)) {
                 testCaseRow = i;
                 break;
@@ -46,7 +45,7 @@ public class ExcelManager {
         return testCaseRow;
     }
 
-    private static String[][] getTableArray(int testMethodRowNumber) {
+    private static String[][] getTableArray(XSSFSheet excelWSheet, int testMethodRowNumber) {
 
         int totalCols;
         try {
@@ -55,7 +54,7 @@ public class ExcelManager {
             throw new RuntimeException("Please add default data on 1st row of your Testdata.xlsx");
         }
         for (int c = 1 ; c <= totalCols ; c++) {
-            String cellCheckData = getCellData(testMethodRowNumber, c);
+            String cellCheckData = getCellData(excelWSheet, testMethodRowNumber, c);
             if (cellCheckData.isEmpty()) {
                 totalCols = c - 1;
                 break;
@@ -66,14 +65,14 @@ public class ExcelManager {
         String[][] tabArray = new String[1][totalCols];
         int j = 1;
         while (j <= totalCols) {
-            tabArray[0][ci] = getCellData(testMethodRowNumber, j);
+            tabArray[0][ci] = getCellData(excelWSheet, testMethodRowNumber, j);
             j++;
             ci++;
         }
         return tabArray;
     }
 
-    private static String getCellData(int rowNumber, int columnNumber) {
+    private static String getCellData(XSSFSheet excelWSheet, int rowNumber, int columnNumber) {
         XSSFCell cell = excelWSheet.getRow(rowNumber).getCell(columnNumber);
 
         if (cell == null) return "";

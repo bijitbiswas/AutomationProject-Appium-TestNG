@@ -23,7 +23,7 @@ public class ConfigurationManager extends GeneralFunction {
     final DesiredCapabilities androidCapabilities = loadCapabilities("AndroidCapabilities");
     final DesiredCapabilities iOSCapabilities = loadCapabilities("iOSCapabilities");
     final HashMap<String, Object> lambdaTestCapabilities = loadLambdaTestCapabilities();
-    final DesiredCapabilities browserstackCapabilities = loadBrowserstackCapabilities();
+    final HashMap<String, Object> browserstackCapabilities = loadBrowserstackCapabilities();
     public String testcaseName;
     final String lambdaTestAuth = getLambdaTestAuth();
     public ArrayList<String> lambdaTestMediaIds;
@@ -70,8 +70,9 @@ public class ConfigurationManager extends GeneralFunction {
         return capabilities;
     }
 
-    private DesiredCapabilities loadBrowserstackCapabilities() {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+    private HashMap<String, Object> loadBrowserstackCapabilities() {
+
+        HashMap<String, Object> capabilitiesMap = new HashMap<>();
         HashMap<String, Object> bsOptions = new HashMap<>();
 
         assert properties != null;
@@ -81,23 +82,14 @@ public class ConfigurationManager extends GeneralFunction {
 
             for (String key : jsonObject.keySet()) {
                 Object keyValue = jsonObject.get(key);
-                if (Objects.equals(key, "userName") || Objects.equals(key, "accessKey") ||
-                        Objects.equals(key, "projectName") || Objects.equals(key, "buildName") ||
-                        Objects.equals(key, "sessionName")) {
+                if (key.matches("userName|accessKey|projectName|buildName|sessionName")) {
                     bsOptions.put(key, keyValue);
                 } else
-                    capabilities.setCapability("appium:"+key, keyValue);
+                    capabilitiesMap.put("appium:"+key, keyValue);
             }
-            bsOptions.put("appiumVersion", "2.19.0");
-            capabilities.setCapability("appium:locale", "en_US");
-            capabilities.setCapability("appium:autoGrantPermissions", true);
-            capabilities.setCapability("appium:gpsEnabled", true);
-            capabilities.setCapability("appium:browserstack.idleTimeout", 160);
-            capabilities.setCapability("appium:browserstack.timezone", "Los_Angeles");
-            capabilities.setCapability("appium:interactiveDebugging", true);
-            capabilities.setCapability("bstack:options", bsOptions);
+            capabilitiesMap.put("bstack:options", bsOptions);
         }
-        return capabilities;
+        return capabilitiesMap;
     }
 
     private HashMap<String, Object> loadLambdaTestCapabilities() {

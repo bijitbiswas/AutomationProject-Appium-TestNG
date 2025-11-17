@@ -2,7 +2,7 @@ package mobileAutomation;
 
 public final class Constants {
 
-    public static final String BROWSERSTACK_URL = "https://hub-cloud.browserstack.com/wd/hub";
+    public static final String BROWSERSTACK_URL = "http://hub.browserstack.com/wd/hub";
     public static final String LAMBDATEST_GRID_URL = "@mobile-hub.lambdatest.com/wd/hub";
     public static final String LAMBDATEST_API_URL = "https://api.lambdatest.com/mfs/v1.0";
     public static final String ANDROID = "Android";
@@ -10,9 +10,9 @@ public final class Constants {
     public static final String LAMBDATEST = "LambdaTest";
     public static final String LAMBDATEST_ANDROID = "LambdaTest-Android";
     public static final String LAMBDATEST_IOS = "LambdaTest-iOS";
-    public static final String BROWSERSTACK = "Browserstack";
-    public static final String BROWSERSTACK_ANDROID = "Browserstack-Android";
-    public static final String BROWSERSTACK_IOS = "Browserstack-iOS";
+    public static final String BROWSERSTACK = "BrowserStack";
+    public static final String BROWSERSTACK_ANDROID = "BrowserStack-Android";
+    public static final String BROWSERSTACK_IOS = "BrowserStack-iOS";
 
     public static final String TEST_DATA_EXCEL_PATH = "src/test/java/mobileAutomation/testData/Testdata.xlsx";
     public static final String TEST_DATA_EXCEL_SHEET_NAME = "Sheet1";

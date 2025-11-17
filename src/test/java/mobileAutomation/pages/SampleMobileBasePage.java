@@ -117,16 +117,13 @@ public class SampleMobileBasePage extends BasePage {
         type(fullNameField, "John Doe");
         type(addressLine1, "123 Main St");
         hideKeyboard();
-        click(fullNameField);
         type(city, "New York");
-        click(fullNameField);
         hideKeyboard();
         type(zipCode, "10001");
-        click(fullNameField);
         hideKeyboard();
         type(country, "USA");
-        click(fullNameField);
         hideKeyboard();
+        swipeUp();
         click(toPaymentButton);
     }
 
@@ -143,6 +140,7 @@ public class SampleMobileBasePage extends BasePage {
         validateText("John Doe");
         validateText("123 Main St");
         validateText("New York");
+        swipeUp();
         validateText("10001");
         validateText("USA");
 
