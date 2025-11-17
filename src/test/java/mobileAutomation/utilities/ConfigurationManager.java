@@ -81,10 +81,12 @@ public class ConfigurationManager extends GeneralFunction {
 
             for (String key : jsonObject.keySet()) {
                 Object keyValue = jsonObject.get(key);
-                if (Objects.equals(key, "userName") || Objects.equals(key, "accessKey")) {
+                if (Objects.equals(key, "userName") || Objects.equals(key, "accessKey") ||
+                        Objects.equals(key, "projectName") || Objects.equals(key, "buildName") ||
+                        Objects.equals(key, "sessionName")) {
                     bsOptions.put(key, keyValue);
                 } else
-                    capabilities.setCapability(key, keyValue);
+                    capabilities.setCapability("appium:"+key, keyValue);
             }
             bsOptions.put("appiumVersion", "2.19.0");
             capabilities.setCapability("appium:locale", "en_US");
