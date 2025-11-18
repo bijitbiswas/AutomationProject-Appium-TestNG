@@ -20,14 +20,15 @@ public class LambdaTestManager {
 
         for (String filePath : filePaths) {
             File file = new File(filePath);
+
             String lambdaTestUsername = lambdaTestAuth.split(":")[0];
             String lambdaTestAccessKey = lambdaTestAuth.split(":")[1];
+            String customId = file.getName();
 
             Response response = given()
                     .auth().preemptive().basic(lambdaTestUsername, lambdaTestAccessKey)
                     .multiPart("media_file", file)
-//                    .multiPart("type", "image")
-//                    .multiPart("custom_id", "abrakadabra")
+                    .multiPart("custom_id", customId)
                     .when()
                     .post("/media/upload")
                     .then()
@@ -50,14 +51,4 @@ public class LambdaTestManager {
                         status + "\", \"remark\":\"" + remark + "\"}} ");
     }
 
-    static void throttleLambdaTestNetwork(AppiumDriver mobileDriver, int downloadSpeed, int uploadSpeed, int latency) {
-//
-//        ((JavascriptExecutor) mobileDriver).executeScript(
-//                "lambda-hook: {\"action\": \"customNetworkProfile\",\"arguments\": " +
-//                        "{ \"downloadSpeed\": 20, \"uploadSpeed\" : 6, \"latency\": 1000 }} ");
-//
-        mobileDriver.executeScript("customNetworkProfile: { \"downloadSpeed\": 20, \"uploadSpeed\" : 6, \"latency\": 1000 }" );
-//        mobileDriver.executeScript("updateNetworkProfile=offline");
-//
-    }
 }

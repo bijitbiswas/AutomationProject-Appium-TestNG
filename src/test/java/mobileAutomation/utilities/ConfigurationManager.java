@@ -1,5 +1,6 @@
 package mobileAutomation.utilities;
 
+import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.json.JSONObject;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -25,8 +26,8 @@ public class ConfigurationManager extends GeneralFunction {
     final HashMap<String, Object> lambdaTestCapabilities = loadLambdaTestCapabilities();
     final HashMap<String, Object> browserstackCapabilities = loadBrowserstackCapabilities();
     public String testcaseName;
-    final String lambdaTestAuth = getLambdaTestAuth();
-    public ArrayList<String> lambdaTestMediaIds;
+    public ArrayList<String> mediaIds;
+    final String cloudProviderAuth = getCloudProviderAuth();
 
 
     /**
@@ -64,7 +65,7 @@ public class ConfigurationManager extends GeneralFunction {
             JSONObject jsonObject = new JSONObject(appiumCapabilities);
             for (String key : jsonObject.keySet()) {
                 Object keyValue = jsonObject.get(key);
-                capabilities.setCapability(key, keyValue.toString());
+                capabilities.setCapability("appium:"+key, keyValue.toString());
             }
         }
         return capabilities;
@@ -106,9 +107,26 @@ public class ConfigurationManager extends GeneralFunction {
         return capabilitiesMap;
     }
 
+    public String getCloudProviderAuth() {
+        if (driverName.contains(Constants.LAMBDATEST)) {
+            return getLambdaTestAuth();
+        } else if (driverName.contains(Constants.BROWSERSTACK)) {
+            return getBrowserStackAuth();
+        }
+        return null;
+    }
+
     private String getLambdaTestAuth() {
         String lambdaTestCapabilities = properties.getProperty("LambdaTestCapabilities");
         JSONObject jsonObject = new JSONObject(lambdaTestCapabilities);
+        String userName = jsonObject.getString("userName");
+        String accessKey = jsonObject.getString("accessKey");
+        return userName + ":" + accessKey;
+    }
+
+    private String getBrowserStackAuth() {
+        String browserStackCapabilities = properties.getProperty("BrowserstackCapabilities");
+        JSONObject jsonObject = new JSONObject(browserStackCapabilities);
         String userName = jsonObject.getString("userName");
         String accessKey = jsonObject.getString("accessKey");
         return userName + ":" + accessKey;

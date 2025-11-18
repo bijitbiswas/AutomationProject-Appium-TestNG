@@ -106,7 +106,7 @@ public class DriverManager extends GeneralFunction {
 
     private static void initializeLambdaTestDriver(String driverName, ConfigurationManager configurationManager) {
 
-        String lambdaTestAuth = configurationManager.lambdaTestAuth;
+        String lambdaTestAuth = configurationManager.cloudProviderAuth;
         String lambdaTestURL = "https://" + lambdaTestAuth + Constants.LAMBDATEST_GRID_URL;
         URL gridUrl;
         try {
@@ -145,7 +145,7 @@ public class DriverManager extends GeneralFunction {
     private static DesiredCapabilities getAndroidCapabilities(ConfigurationManager configurationManager) {
         DesiredCapabilities capabilities = configurationManager.androidCapabilities;
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("automationName", "UiAutomator2");
+        capabilities.setCapability("appium:automationName", "UiAutomator2");
         capabilities.setCapability("appium:skipDeviceInitialization", true);
         capabilities.setCapability("appium:ignoreHiddenApiPolicyError", true);
         capabilities.setCapability("appium:appWaitActivity", "*");
@@ -158,7 +158,7 @@ public class DriverManager extends GeneralFunction {
     private static DesiredCapabilities getIOSCapabilities(ConfigurationManager configurationManager) {
         DesiredCapabilities capabilities = configurationManager.iOSCapabilities;
         capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("automationName", "XCUITest");
+        capabilities.setCapability("appium:automationName", "XCUITest");
         capabilities.setCapability("appium:noReset", true);
         return capabilities;
     }
@@ -167,6 +167,7 @@ public class DriverManager extends GeneralFunction {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         HashMap<String, Object> browserstackOptions = configurationManager.browserstackCapabilities;
+        ArrayList<String> mediaIds = configurationManager.mediaIds;
         String testcaseName = configurationManager.testcaseName;
 
         if (configurationManager.driverName.equalsIgnoreCase(Constants.BROWSERSTACK_ANDROID))
@@ -191,6 +192,7 @@ public class DriverManager extends GeneralFunction {
             } else
                 capabilities.setCapability(key, value);
         }
+        capabilities.setCapability("appium:browserstack.uploadMedia", mediaIds);
         capabilities.setCapability("appium:locale", "en_US");
         capabilities.setCapability("appium:autoGrantPermissions", true);
         capabilities.setCapability("appium:gpsEnabled", true);
@@ -204,7 +206,7 @@ public class DriverManager extends GeneralFunction {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         HashMap<String, Object> lambdaTestOptions = configurationManager.lambdaTestCapabilities;
-        ArrayList<String> lambdaTestMediaIds = configurationManager.lambdaTestMediaIds;
+        ArrayList<String> mediaIds = configurationManager.mediaIds;
         String testcaseName = configurationManager.testcaseName;
 
         if (configurationManager.driverName.equalsIgnoreCase(Constants.LAMBDATEST_ANDROID)) {
@@ -223,7 +225,7 @@ public class DriverManager extends GeneralFunction {
         lambdaTestOptions.put("console", true);
         lambdaTestOptions.put("visual", false); // If true : Takes screenshots which is visible in Meta Data > Media
         lambdaTestOptions.put("devicelog", false);
-        lambdaTestOptions.put("uploadMedia", lambdaTestMediaIds);
+        lambdaTestOptions.put("uploadMedia", mediaIds);
         lambdaTestOptions.put("network", true);
 //        lambdaTestOptions.put("networkProfile", "4g-lte-advanced-good");
 

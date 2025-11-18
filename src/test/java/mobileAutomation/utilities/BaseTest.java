@@ -24,13 +24,15 @@ public class BaseTest {
         ConfigurationManager configurationManager = new ConfigurationManager();
         configurationManager.testcaseName = this.getClass().getSimpleName();
 
-        ArrayList<String> uploadedIds;
-
-        if (configurationManager.driverName.contains(Constants.LAMBDATEST)
-                && filePaths != null) {
-            String lambdaTestAuth = configurationManager.lambdaTestAuth;
-            uploadedIds = LambdaTestManager.uploadFileToLambdaTest(lambdaTestAuth, filePaths);
-            configurationManager.lambdaTestMediaIds = uploadedIds;
+        if (filePaths != null) {
+            ArrayList<String> uploadedIds = null;
+            String auth = configurationManager.cloudProviderAuth;
+            if (configurationManager.driverName.contains(Constants.LAMBDATEST)) {
+                uploadedIds = LambdaTestManager.uploadFileToLambdaTest(auth, filePaths);
+            } else if (configurationManager.driverName.contains(Constants.BROWSERSTACK)) {
+                uploadedIds = BrowserStackManager.uploadFileToBrowserStack(auth, filePaths);
+            }
+            configurationManager.mediaIds = uploadedIds;
         }
 
         DriverManager.initializeDriver(configurationManager);
@@ -54,7 +56,7 @@ public class BaseTest {
         ExtentReportManager.logTestResult(result);
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void tearDown(ITestContext context) {
         int failedCount = context.getFailedTests().size();
         int skippedCount = context.getSkippedTests().size();

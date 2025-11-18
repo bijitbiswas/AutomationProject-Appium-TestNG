@@ -14,23 +14,25 @@ import static io.restassured.RestAssured.given;
 
 public class BrowserStackManager {
 
-    static ArrayList<String> uploadFileToBrowserStack(String lambdaTestAuth, String[] filePaths) {
-        System.out.println("🚀 Uploading files to LambdaTest cloud devices...");
+    static ArrayList<String> uploadFileToBrowserStack(String browserStackAuth, String[] filePaths) {
+        System.out.println("🚀 Uploading files to BrowserStack cloud devices...");
+
         ArrayList<String> uploadedIds = new ArrayList<>();
-        RestAssured.baseURI = Constants.LAMBDATEST_API_URL;
+        RestAssured.baseURI = Constants.BROWSERSTACK_API_URL;
 
         for (String filePath : filePaths) {
             File file = new File(filePath);
-            String lambdaTestUsername = lambdaTestAuth.split(":")[0];
-            String lambdaTestAccessKey = lambdaTestAuth.split(":")[1];
+
+            String browserStackUsername = browserStackAuth.split(":")[0];
+            String browserStackAccessKey = browserStackAuth.split(":")[1];
+            String customId = file.getName();
 
             Response response = given()
-                    .auth().preemptive().basic(lambdaTestUsername, lambdaTestAccessKey)
-                    .multiPart("media_file", file)
-//                    .multiPart("type", "image")
-//                    .multiPart("custom_id", "abrakadabra")
+                    .auth().preemptive().basic(browserStackUsername, browserStackAccessKey)
+                    .multiPart("file", file)
+                    .multiPart("custom_id", customId)
                     .when()
-                    .post("/media/upload")
+                    .post("/app-automate/upload-media")
                     .then()
                     .log().all()
                     .extract().response();

@@ -7,6 +7,13 @@ import org.testng.annotations.Test;
 
 public class SampleMobileAndroidTest extends BaseTest {
 
+    {
+        filePaths = new String[]{
+                "src/test/java/mobileAutomation/testFiles/SAMPLE_PDF_FILE.pdf",
+                "src/test/java/mobileAutomation/testFiles/SAMPLE_IMAGE_FILE.png"
+        };
+    }
+
     SampleLoginBasePage sampleLoginPg;
     SampleMobileBasePage sampleMobilePg;
 

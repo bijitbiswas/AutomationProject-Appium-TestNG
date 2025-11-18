@@ -3,6 +3,7 @@ package mobileAutomation;
 public final class Constants {
 
     public static final String BROWSERSTACK_URL = "http://hub.browserstack.com/wd/hub";
+    public static final String BROWSERSTACK_API_URL = "https://api-cloud.browserstack.com";
     public static final String LAMBDATEST_GRID_URL = "@mobile-hub.lambdatest.com/wd/hub";
     public static final String LAMBDATEST_API_URL = "https://api.lambdatest.com/mfs/v1.0";
     public static final String ANDROID = "Android";
