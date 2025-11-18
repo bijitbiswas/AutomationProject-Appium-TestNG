@@ -6,8 +6,23 @@ Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It 
 - Unified driver lifecycle that starts/stops a local Appium server and handles BrowserStack/LambdaTest sessions automatically.
 - Page Object Model with reusable interaction, validation, mobile utility, and image-recognition helpers.
 - Data-driven tests backed by Excel (`Testdata.xlsx`) and TestNG data providers.
-- ExtentReports HTML reports with automatic screenshots for pass/fail and optional media uploads to LambdaTest.
+- ExtentReports HTML reports with automatic screenshots for pass/fail and optional media uploads to BrowserStack and LambdaTest.
+- Built-in helpers to push custom media to your remote device session before each run.
 - Visual assertions via the Appium Images plugin with baseline management and diff artifacts.
+- One-stop mobile automation stack that spans local simulators/emulators, plugged-in devices, and BrowserStack/LambdaTest real-device clouds for both Android and iOS.
+
+## Cloud Device Integrations
+Harness built-in integrations with the leading real device clouds—upload custom media, stream live sessions, and report results without leaving the framework.
+
+<p align="center">
+  <img src="ReadmeImages/browserstack-logo.png" alt="BrowserStack Integration" width="180" height="80" />
+  <img src="ReadmeImages/lambdatest-logo.png" alt="LambdaTest Integration" width="180" height="80" />
+</p>
+
+## Platform Coverage
+- **Local Simulators/Emulators:** Spin up Android Emulator or iOS Simulator sessions backed by a managed Appium 2 server, with shared capabilities loaded from `config/config.properties`.
+- **Physical Devices:** Plug in real hardware, override desired capabilities, and leverage the same Page Object and reporting layers without code changes.
+- **Cloud Device Farms:** Seamlessly launch the same tests on BrowserStack and LambdaTest with pre-run media uploads, automatic capability enrichment, and status updates pushed back to their dashboards.
 
 ## Project Layout
 | Path | Purpose |
@@ -38,7 +53,7 @@ Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It 
    - Fill in capability JSON blobs with the correct device identifiers, platform versions, app references, and credentials for your target environment.
    - Adjust `WaitTime` or any optional capability flags as needed.
 4. (Optional) Place additional app binaries under `apps/` and reference them in the capability JSON.
-5. If you plan to upload media to LambdaTest during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
+5. If you plan to upload media to LambdaTest or BrowserStack during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
 
 ## Running Tests
 Run everything from the project root.
@@ -57,7 +72,22 @@ Run everything from the project root.
   ```
 - Pointing tests to BrowserStack or LambdaTest:
   1. Set `DriverName` accordingly and supply credentials/app IDs in `config.properties`.
-  2. Re-run the same Maven command; the framework handles remote driver creation, status updates, and (for LambdaTest) optional media uploads.
+  2. Re-run the same Maven command; the framework handles remote driver creation, status updates, and optional media uploads for both providers.
+
+### Uploading Custom Media to Cloud Sessions
+- Add the assets you need (PDFs, images, etc.) to the repository or ensure they are reachable from the JVM running the tests.
+- In any test class that extends `BaseTest`, assign `filePaths` with absolute or project-relative locations. For example:
+  ```java
+  {
+      filePaths = new String[]{
+              "src/test/java/mobileAutomation/testFiles/SAMPLE_PDF_FILE.pdf",
+              "src/test/java/mobileAutomation/testFiles/SAMPLE_IMAGE_FILE.png"
+      };
+  }
+  ```
+- During `@BeforeClass`, the framework uploads those files to the active cloud using REST APIs (`/app-automate/upload-media` for BrowserStack, `/media/upload` for LambdaTest) and captures the returned media IDs.
+- The media IDs are automatically injected into the session capabilities (`appium:browserstack.uploadMedia` or `lt:Options.uploadMedia`), so your custom files are ready on the remote device before test steps execute.
+- Leave `filePaths` unset to skip uploads on runs that don't require additional media.
 
 ### Data-Driven Execution
 - The `@DataProvider` in `BaseTest` pulls values from `src/test/java/mobileAutomation/testData/Testdata.xlsx`. Add rows keyed by the test method name to extend scenarios.
