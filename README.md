@@ -114,3 +114,16 @@ Run everything from the project root.
 - Store additional test data in `Testdata.xlsx` and reference it via matching method names.
 - Configure new TestNG suites under `MobileTestSuites/` to orchestrate different environments, groups, or parallel strategies.
 
+## ⚠️ Trial Version License
+
+This framework can be **tried free for 30 days**.
+
+After the trial period, you must:
+
+- Stop using the framework, or
+- Obtain written permission from the author, or
+- Purchase a commercial license
+
+**License:** See [LICENSE](./LICENSE)
+
+Contact: biswas.bijit1994@gmail.com
