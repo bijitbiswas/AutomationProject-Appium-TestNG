@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 
 public class ServerManager extends GeneralFunction {
 
@@ -55,7 +54,6 @@ public class ServerManager extends GeneralFunction {
 
         String osName = System.getProperty("os.name").toLowerCase();
         println("Operating System: " + osName);
-        // Run command "appium plugin install images" to install images plugin
         AppiumServiceBuilder builder = new AppiumServiceBuilder()
                 .usingAnyFreePort()
                 .withArgument(GeneralServerFlag.SESSION_OVERRIDE) // Kills old appium session if left running
@@ -65,7 +63,6 @@ public class ServerManager extends GeneralFunction {
 
         if (!osName.contains("win")) {
             String appiumPath = findAppiumPathInMacAndLinux();
-            assert appiumPath != null;
             builder.withAppiumJS(new File(appiumPath));
         }
 
@@ -85,18 +82,9 @@ public class ServerManager extends GeneralFunction {
     }
 
     private static String findAppiumPathInMacAndLinux() {
-        try {
-            Process process = Runtime.getRuntime().exec("which appium");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String path = reader.readLine();
-            if (path != null && !path.isEmpty()) {
-                println("Appium path found: " + path);
-                return path.trim();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        String path = runCommand("which", "appium");
+        println("Appium path found: " + path);
+        return path;
     }
 
     private static void ensureImagesPluginInstalled() {
@@ -105,6 +93,10 @@ public class ServerManager extends GeneralFunction {
             println("Images plugin not found. Installing...");
             String installOutput = runCommand(appiumCMD, "plugin", "install", "images");
             println(installOutput);
+            if (installOutput.toLowerCase().contains("error")) {
+                throw new RuntimeException("FAILED TO INSTALL IMAGES PLUGIN : " +
+                        "PLEASE INSTALL MANUALLY USING COMMAND 'appium plugin install images'");
+            }
         } else {
             println("Images plugin is already installed.");
         }
@@ -146,7 +138,7 @@ public class ServerManager extends GeneralFunction {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return output.toString();
+        return output.toString().trim();
     }
 
     private static String getAppiumCommand() {
