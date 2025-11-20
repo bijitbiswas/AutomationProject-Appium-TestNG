@@ -23,6 +23,9 @@ public class ServerManager extends GeneralFunction {
     public static void startServer() {
         if (service.get() == null) {
             println("Starting Appium Server");
+
+            ensureImagesPluginInstalled();
+
             AppiumDriverLocalService localService = AppiumDriverLocalService
                     .buildService(getAppiumDriverService());
             localService.start();
@@ -55,10 +58,9 @@ public class ServerManager extends GeneralFunction {
         // Run command "appium plugin install images" to install images plugin
         AppiumServiceBuilder builder = new AppiumServiceBuilder()
                 .usingAnyFreePort()
-                .withArgument(GeneralServerFlag.SESSION_OVERRIDE)
-                .withArgument(GeneralServerFlag.USE_PLUGINS, "images")
-                .withTimeout(Duration.ofSeconds(10))
-                .withArgument(GeneralServerFlag.LOG_LEVEL, "error")
+                .withArgument(GeneralServerFlag.SESSION_OVERRIDE) // Kills old appium session if left running
+                .withArgument(GeneralServerFlag.USE_PLUGINS, "images") // Enable images plugin for image element recognition
+                .withArgument(GeneralServerFlag.LOG_LEVEL, "error") // Logs server log only when error occurs
                 .withLogFile(new File(createAppiumServerDirectory() + File.separator + "AppiumServer.log"));
 
         if (!osName.contains("win")) {
@@ -95,5 +97,63 @@ public class ServerManager extends GeneralFunction {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static void ensureImagesPluginInstalled() {
+        if (!isImagesPluginInstalled()) {
+            String appiumCMD = getAppiumCommand();
+            println("Images plugin not found. Installing...");
+            String installOutput = runCommand(appiumCMD, "plugin", "install", "images");
+            println(installOutput);
+        } else {
+            println("Images plugin is already installed.");
+        }
+    }
+
+    private static boolean isImagesPluginInstalled() {
+        String appiumCMD = getAppiumCommand();
+        String output = runCommand(appiumCMD, "plugin", "list");
+        println(output);
+
+        boolean imagesInstalled = false;
+        for (String line : output.split("\n")) {
+            // Remove ANSI color codes if present
+            String lineText = line.trim().replaceAll("\u001B\\[[;\\d]*m", "");
+            if (lineText.startsWith("- images@") && lineText.contains("[installed")) {
+                imagesInstalled = true;
+                break;
+            }
+        }
+        
+        return imagesInstalled;
+    }
+
+    private static String runCommand(String... command) {
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true);
+
+        StringBuilder output = new StringBuilder();
+        try {
+            Process process = pb.start();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return output.toString();
+    }
+
+    private static String getAppiumCommand() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            return "appium.cmd";
+        }
+        return "appium";
     }
 }
