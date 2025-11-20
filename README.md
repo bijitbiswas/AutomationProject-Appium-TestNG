@@ -38,15 +38,17 @@ Harness built-in integrations with the leading real device clouds—upload custo
 ## Prerequisites
 - Java 18+ and Maven 3.8+ in your `PATH`.
 - Node.js 18+ and Appium 2.x (`npm install -g appium`).
-- Appium Images plugin (`appium plugin install images`) for visual checks.
+- Appium Images plugin for visual checks  
+  - Windows local runs install it automatically when you launch the framework.  
+  - macOS users install it manually via `sudo appium plugin install images`.
 - Xcode + iOS simulators (macOS only) and/or Android SDK + emulators for local runs.
 - BrowserStack and/or LambdaTest credentials (optional, for cloud execution).
 
 ## Initial Setup
 1. Install dependencies listed above and verify `mvn -v` and `appium -v`.
-2. From the project root, install the images plugin once:
+2. (macOS only) From the project root, install the images plugin once:
    ```bash
-   appium plugin install images
+   sudo appium plugin install images
    ```
 3. Update `config/config.properties`:
    - Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
