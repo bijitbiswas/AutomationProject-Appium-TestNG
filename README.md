@@ -1,4 +1,4 @@
-# AutomationProject Appium TestNG
+# Mobile Automation Framework (Appium + TestNG)
 
 Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It supports Android and iOS testing on local devices/emulators as well as BrowserStack and LambdaTest clouds, and layers in data-driven execution, visual validation, and rich reporting.
 
