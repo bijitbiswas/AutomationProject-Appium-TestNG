@@ -2,7 +2,7 @@
 
 Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It supports Android and iOS testing on local devices/emulators as well as BrowserStack and LambdaTest clouds, and layers in data-driven execution, visual validation, and rich reporting.
 
-## Highlights
+## Key Features
 - Unified driver lifecycle that starts/stops a local Appium server and handles BrowserStack/LambdaTest sessions automatically.
 - Page Object Model with reusable interaction, validation, mobile utility, and image-recognition helpers.
 - Data-driven tests backed by Excel (`Testdata.xlsx`) and TestNG data providers.
@@ -24,57 +24,126 @@ Harness built-in integrations with the leading real device clouds—upload custo
 - **Physical Devices:** Plug in real hardware, override desired capabilities, and leverage the same Page Object and reporting layers without code changes.
 - **Cloud Device Farms:** Seamlessly launch the same tests on BrowserStack and LambdaTest with pre-run media uploads, automatic capability enrichment, and status updates pushed back to their dashboards.
 
-## Project Layout
-| Path | Purpose |
-| --- | --- |
-| `apps/` | Sample Android (`*.apk`) and iOS (`*.app`) binaries used for local runs. |
-| `config/config.properties` | Central place to choose driver targets and define capabilities for all environments. |
-| `MobileTestSuites/*.xml` | Ready-made TestNG suites for Android/iOS and parallel examples. |
-| `src/test/java/mobileAutomation/` | Automation code: constants, page objects, utilities, drivers, managers, and tests. |
-| `TestReport/` | Generated ExtentReports (time-stamped per run). |
-| `VisualCheckResults/` | Visual comparison output from image-based assertions. |
-| `logs/` | Appium server logs captured during local executions. |
-
 ## Prerequisites
 - Java 18+ and Maven 3.8+ in your `PATH`.
 - Node.js 18+ and Appium 2.x (`npm install -g appium`).
-- Appium Images plugin for visual checks  
-  - Windows local runs install it automatically when you launch the framework.  
-  - macOS users install it manually via `sudo appium plugin install images`.
+- Appium Images plugin for visual checks
+    - Windows local runs install it automatically when you launch the framework.
+    - macOS users install it manually via `sudo appium plugin install images`.
 - Xcode + iOS simulators (macOS only) and/or Android SDK + emulators for local runs.
 - BrowserStack and/or LambdaTest credentials (optional, for cloud execution).
 
+## Project Structure
+| Path                               | Purpose |
+|------------------------------------| --- |
+| `apps/`                            | Sample Android (`*.apk`) and iOS (`*.app`) binaries used for local runs. |
+| `config/config.properties`         | Central place to choose driver targets and define capabilities for all environments. |
+| `MobileTestSuites/*.xml`           | Ready-made TestNG suites for Android/iOS. |
+| `src/test/java/mobileAutomation/*` | Automation code: constants, page objects, utilities, drivers, managers, and tests. |
+| `TestReport/`                      | Generated ExtentReports (time-stamped per run). |
+| `VisualCheckResults/`              | Visual comparison output from image-based assertions. |
+
+## Configuration
+1. Open `config/config.properties`; every target platform reads from this single file.
+2. Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
+3. Update the matching capability JSON blob with real device identifiers, platform versions, credentials, and app references.
+
+- **Simulators/Emulators and Physical devices:** keep `DriverName` as `Android` or `iOS` and set `deviceName`/`platformVersion` at your local emulator or simulator. Supply `appPackage`/`bundleId` or `app` paths appropriate for local binaries, `udid` (iOS), and any other required capabilities for the plugged-in hardware.
+- **BrowserStack:** switch `DriverName` to `BrowserStack-Android` or `BrowserStack-iOS`, fill `userName`, `accessKey`, `app` (either uploaded ID or `bs://` handle), and optional build metadata.
+- **LambdaTest:** switch `DriverName` accordingly, provide `userName`, `accessKey`, `app`, and remote device attributes; optional `build` labels help you track sessions in the dashboard.
+- The capability blocks map directly to targets in `config.properties`:
+  - `AndroidCapabilities` → Android emulator or plugged-in device.
+  - `iOSCapabilities` → iOS simulator or real device.
+  - `BrowserstackCapabilities` → BrowserStack cloud sessions.
+  - `LambdaTestCapabilities` → LambdaTest cloud sessions.
+
 ## Initial Setup
-1. Install dependencies listed above and verify `mvn -v` and `appium -v`.
+1. Install prerequisites listed above and verify `mvn -v` and `appium -v`.
 2. (macOS only) From the project root, install the images plugin once:
    ```bash
    sudo appium plugin install images
    ```
-3. Update `config/config.properties`:
-   - Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
-   - Fill in capability JSON blobs with the correct device identifiers, platform versions, app references, and credentials for your target environment.
-   - Adjust `WaitTime` or any optional capability flags as needed.
+3. Configure `config/config.properties` as outlined in the **Configuration** section, including driver selection, capability details, and any optional wait settings.
 4. (Optional) Place additional app binaries under `apps/` and reference them in the capability JSON.
 5. If you plan to upload media to LambdaTest or BrowserStack during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
+
+## Writing Your First Test
+1. Create a page class under `src/test/java/mobileAutomation/pages/` by extending `BasePage` and encapsulating the interactions you need.
+   ```java
+   package mobileAutomation.pages;
+
+   import io.appium.java_client.pagefactory.AndroidFindBy;
+   import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+   import mobileAutomation.utilities.BasePage;
+   import org.openqa.selenium.WebElement;
+
+   public class LoginPage extends BasePage {
+
+       @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='username']")
+       @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField[@name='username']")
+       private WebElement usernameField;
+
+       @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='password']")
+       @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField[@name='password']")
+       private WebElement passwordField;
+
+       @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='login']")
+       @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='login']")
+       private WebElement loginButton;
+
+       public void login(String username, String password) {
+           type(usernameField, username);
+           type(passwordField, password);
+           hideKeyboard();
+           click(loginButton);
+       }
+   }
+   ```
+2. Call the page methods from your TestNG scripts, wiring in media uploads, Excel data, and visual checks as needed.
+   ```java
+   package mobileAutomation.tests;
+
+   import mobileAutomation.pages.LoginPage;
+   import mobileAutomation.utilities.BaseTest;
+   import org.testng.annotations.Test;
+
+   import java.util.Map;
+
+   public class LoginTest extends BaseTest {
+
+       {
+           filePaths = new String[]{
+                   "src/test/java/mobileAutomation/testFiles/WELCOME_BANNER.png"
+           };
+       }
+
+       @Test(dataProvider = "getTestData")
+       public void loginWithValidCredentials(String username, String password) {
+           LoginPage loginPage = new LoginPage();
+           loginPage.login(username, password);
+           loginPage.validateScreenVisible("LoginSuccess");
+       }
+   }
+   ```
+- **BrowserStack/LambdaTest media:** setting `filePaths` pushes custom assets before the remote session starts. See `Uploading Custom Media to Cloud Sessions` for deeper configuration tips.
+- **Excel data:** the shared `getTestData` provider supplies each test invocation with a row keyed to the method name. Details live in `Data-Driven Execution`.
+- **Visual assertions:** call helpers like `validateScreenVisible` once a flow completes. Baseline management is covered in `Visual Assertion Baselines`.
 
 ## Running Tests
 Run everything from the project root.
 
-- Execute the sample Android suite locally:
+- Execute a suite via Maven:
   ```bash
   mvn clean test -DsuiteXmlFile=MobileTestSuites/SampleAndroidSuite.xml
   ```
-- Execute the sample iOS suite locally:
-  ```bash
-  mvn clean test -DsuiteXmlFile=MobileTestSuites/SampleIOSSuite.xml
-  ```
-- Run a specific TestNG group (e.g., only `Smoke` tests):
+- Filter by TestNG group (e.g., only `Smoke` tests):
   ```bash
   mvn clean test -DsuiteXmlFile=MobileTestSuites/SampleAndroidSuite.xml -Dgroups=Smoke
   ```
-- Pointing tests to BrowserStack or LambdaTest:
-  1. Set `DriverName` accordingly and supply credentials/app IDs in `config.properties`.
-  2. Re-run the same Maven command; the framework handles remote driver creation, status updates, and optional media uploads for both providers.
+- To target BrowserStack or LambdaTest:
+  1. Set `DriverName` and credentials/app IDs in `config/config.properties`.
+  2. Re-run the same Maven command; the framework provisions the remote driver, uploads any configured media, and reports session status.
+- Alternatively, right-click any test class or method annotated with `@Test` in your IDE and choose `Run` for a quick ad-hoc execution.
 
 ### Uploading Custom Media to Cloud Sessions
 - Add the assets you need (PDFs, images, etc.) to the repository or ensure they are reachable from the JVM running the tests.
@@ -109,12 +178,6 @@ Run everything from the project root.
 - For iOS, trust the developer certificate and allow WebDriverAgent provisioning if prompted on first launch.
 - When using real devices, grant necessary permissions and update capability JSON with valid UDIDs/platform versions.
 - BrowserStack/LambdaTest executions require stable network access; see the respective dashboards for live sessions and device logs.
-
-## Extending the Framework
-- Add new screens by creating Page Object classes under `src/test/java/mobileAutomation/pages/`.
-- Share reusable actions or validations via the interfaces and implementations in `automationFunctions/` and `automationInterfaces/`.
-- Store additional test data in `Testdata.xlsx` and reference it via matching method names.
-- Configure new TestNG suites under `MobileTestSuites/` to orchestrate different environments, groups, or parallel strategies.
 
 ## ⚠️ Trial Version License
 
