@@ -1,4 +1,4 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import org.openqa.selenium.WebElement;
 

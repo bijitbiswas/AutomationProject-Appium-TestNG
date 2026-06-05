@@ -1,4 +1,4 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.imagecomparison.OccurrenceMatchingOptions;
@@ -8,7 +8,7 @@ import io.appium.java_client.imagecomparison.SimilarityMatchingResult;
 import mobileAutomation.utilities.Constants;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.Region;
-import mobileAutomation.utilities.automationInterfaces.ImageInterface;
+import mobileAutomation.actionUtilities.automationInterfaces.ImageInterface;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;

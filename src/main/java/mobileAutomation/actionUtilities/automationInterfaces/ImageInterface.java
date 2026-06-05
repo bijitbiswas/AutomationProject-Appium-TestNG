@@ -1,4 +1,4 @@
-package mobileAutomation.utilities.automationInterfaces;
+package mobileAutomation.actionUtilities.automationInterfaces;
 
 import mobileAutomation.utilities.Region;
 

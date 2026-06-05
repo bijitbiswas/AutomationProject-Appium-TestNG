@@ -3,7 +3,7 @@ package mobileAutomation.utilities;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import mobileAutomation.utilities.automationFunctions.GeneralFunction;
+import mobileAutomation.actionUtilities.automationFunctions.GeneralFunction;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;

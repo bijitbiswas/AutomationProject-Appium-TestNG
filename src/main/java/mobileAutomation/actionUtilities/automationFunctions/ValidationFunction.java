@@ -1,10 +1,10 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import mobileAutomation.utilities.Constants;
 import mobileAutomation.utilities.ContextManager;
-import mobileAutomation.utilities.automationInterfaces.ValidationInterface;
+import mobileAutomation.actionUtilities.automationInterfaces.ValidationInterface;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;

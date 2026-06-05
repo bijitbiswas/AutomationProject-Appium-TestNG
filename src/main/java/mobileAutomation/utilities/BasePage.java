@@ -2,8 +2,8 @@ package mobileAutomation.utilities;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
-import mobileAutomation.utilities.automationFunctions.*;
-import mobileAutomation.utilities.automationInterfaces.*;
+import mobileAutomation.actionUtilities.automationFunctions.*;
+import mobileAutomation.actionUtilities.automationInterfaces.*;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 

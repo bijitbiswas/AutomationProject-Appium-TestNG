@@ -1,6 +1,6 @@
 package mobileAutomation.utilities;
 
-import mobileAutomation.utilities.automationFunctions.GeneralFunction;
+import mobileAutomation.actionUtilities.automationFunctions.GeneralFunction;
 import org.json.JSONObject;
 import org.openqa.selenium.remote.DesiredCapabilities;
 

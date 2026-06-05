@@ -1,4 +1,4 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.MediaEntityBuilder;
@@ -7,7 +7,7 @@ import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
 import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.ReportingManager;
-import mobileAutomation.utilities.automationInterfaces.ReportingInterface;
+import mobileAutomation.actionUtilities.automationInterfaces.ReportingInterface;
 import org.openqa.selenium.WebDriver;
 
 public class ReportingFunction extends GeneralFunction implements ReportingInterface {

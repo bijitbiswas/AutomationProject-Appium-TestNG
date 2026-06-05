@@ -1,11 +1,11 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import mobileAutomation.utilities.Constants;
 import mobileAutomation.utilities.ContextManager;
-import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
+import mobileAutomation.actionUtilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;

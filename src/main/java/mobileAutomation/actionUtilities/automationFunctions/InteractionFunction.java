@@ -1,10 +1,10 @@
-package mobileAutomation.utilities.automationFunctions;
+package mobileAutomation.actionUtilities.automationFunctions;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import mobileAutomation.utilities.Constants;
 import mobileAutomation.utilities.ContextManager;
-import mobileAutomation.utilities.automationInterfaces.InteractionInterface;
+import mobileAutomation.actionUtilities.automationInterfaces.InteractionInterface;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;

@@ -10,7 +10,7 @@ import com.aventstack.extentreports.model.Media;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import io.appium.java_client.AppiumDriver;
-import mobileAutomation.utilities.automationFunctions.GeneralFunction;
+import mobileAutomation.actionUtilities.automationFunctions.GeneralFunction;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;

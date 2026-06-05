@@ -4,7 +4,7 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServerHasNotBeenStartedLocallyException;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
-import mobileAutomation.utilities.automationFunctions.GeneralFunction;
+import mobileAutomation.actionUtilities.automationFunctions.GeneralFunction;
 
 import java.io.BufferedReader;
 import java.io.File;
