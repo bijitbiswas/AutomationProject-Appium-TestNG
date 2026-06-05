@@ -34,14 +34,73 @@ Harness built-in integrations with the leading real device clouds—upload custo
 - BrowserStack and/or LambdaTest credentials (optional, for cloud execution).
 
 ## Project Structure
-| Path                               | Purpose |
-|------------------------------------| --- |
-| `apps/`                            | Sample Android (`*.apk`) and iOS (`*.app`) binaries used for local runs. |
-| `config/config.properties`         | Central place to choose driver targets and define capabilities for all environments. |
-| `MobileTestSuites/*.xml`           | Ready-made TestNG suites for Android/iOS. |
-| `src/test/java/mobileAutomation/*` | Automation code: constants, page objects, utilities, drivers, managers, and tests. |
-| `TestReport/`                      | Generated ExtentReports (time-stamped per run). |
-| `VisualCheckResults/`              | Visual comparison output from image-based assertions. |
+
+```
+AutomationProject-Appium-TestNG/
+│
+├── apps/                                          # Android (.apk) and iOS (.app) binaries for local runs
+├── config/
+│   └── config.properties                          # Driver selection and all capability definitions
+├── MobileTestSuites/
+│   ├── SampleAndroidSuite.xml                     # TestNG suite for Android
+│   └── SampleIOSSuite.xml                         # TestNG suite for iOS
+│
+├── src/
+│   ├── main/java/mobileAutomation/
+│   │   └── utilities/                             # Framework core — available to both main and test
+│   │       ├── BaseManager.java                   # Lifecycle logic: beforeSuite/beforeClass/beforeMethod etc.
+│   │       ├── BasePage.java                      # Base class for all page objects
+│   │       ├── BrowserStackManager.java           # BrowserStack upload and session status helpers
+│   │       ├── ConfigurationManager.java          # Reads config.properties and parses capabilities
+│   │       ├── Constants.java                     # Shared constants (driver names, URLs, etc.)
+│   │       ├── ContextManager.java                # Holds AppiumDriver, waits, and ExtentTest per class
+│   │       ├── DriverManager.java                 # Creates, resets, and quits the Appium driver
+│   │       ├── ExcelManager.java                  # Reads test data rows from Testdata.xlsx
+│   │       ├── LambdaTestManager.java             # LambdaTest upload and session status helpers
+│   │       ├── Region.java                        # Region model for image-based assertions
+│   │       ├── ReportingManager.java              # ExtentReports setup, test creation, and logging
+│   │       ├── RetryAnalyzer.java                 # IRetryAnalyzer — retries failed tests once
+│   │       ├── RetryListener.java                 # IAnnotationTransformer — auto-attaches RetryAnalyzer
+│   │       ├── ServerManager.java                 # Starts/stops the local Appium server (once per suite)
+│   │       ├── automationFunctions/               # Reusable action and assertion helpers
+│   │       │   ├── GeneralFunction.java
+│   │       │   ├── ImageFunction.java
+│   │       │   ├── InteractionFunction.java
+│   │       │   ├── MobileGeneralFunction.java
+│   │       │   ├── ReportingFunction.java
+│   │       │   └── ValidationFunction.java
+│   │       └── automationInterfaces/              # Interfaces implemented by automationFunctions
+│   │           ├── ImageInterface.java
+│   │           ├── InteractionInterface.java
+│   │           ├── MobileGeneralInterface.java
+│   │           ├── ReportingInterface.java
+│   │           └── ValidationInterface.java
+│   │
+│   └── test/java/mobileAutomation/
+│       ├── BaseTest.java                          # TestNG annotations (@BeforeSuite … @AfterSuite) — extend this
+│       ├── pages/                                 # Page Object classes (extend BasePage)
+│       │   ├── SampleLoginBasePage.java
+│       │   └── SampleMobileBasePage.java
+│       ├── testcases/                             # Test classes (extend BaseTest)
+│       │   ├── SampleMobileAndroidTest.java
+│       │   ├── SampleMobileIOSTest.java
+│       │   └── SampleMobileParallelCheckTest.java
+│       ├── testData/
+│       │   └── Testdata.xlsx                      # Excel workbook — one sheet per test class, rows keyed by method name
+│       ├── testFiles/                             # Files uploaded to cloud device sessions (PDFs, images, etc.)
+│       │   ├── SAMPLE_IMAGE_FILE.png
+│       │   └── SAMPLE_PDF_FILE.pdf
+│       └── imageLocators/                         # Visual baseline screenshots (optional — only for image assertions)
+│           ├── Android/
+│           │   └── BASELINE_<Name>_<DeviceId>.png
+│           └── iOS/
+│               └── BASELINE_<Name>_<DeviceId>.png
+│
+├── TestReport/                                    # Generated ExtentReports HTML (timestamped per run)
+├── VisualCheckResults/                            # Image comparison output (CHECK_* pass / FAIL_* mismatch)
+└── logs/
+    └── AppiumServer.log                           # Local Appium server log
+```
 
 ## Configuration
 1. Open `config/config.properties`; every target platform reads from this single file.
@@ -68,66 +127,178 @@ Harness built-in integrations with the leading real device clouds—upload custo
 5. If you plan to upload media to LambdaTest or BrowserStack during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
 
 ## Writing Your First Test
-1. Create a page class under `src/test/java/mobileAutomation/pages/` by extending `BasePage` and encapsulating the interactions you need.
-   ```java
-   package mobileAutomation.pages;
 
-   import io.appium.java_client.pagefactory.AndroidFindBy;
-   import io.appium.java_client.pagefactory.iOSXCUITFindBy;
-   import mobileAutomation.utilities.BasePage;
-   import org.openqa.selenium.WebElement;
+### 1. Create a Page class
 
-   public class LoginPage extends BasePage {
+Add a class under `src/test/java/mobileAutomation/pages/` that extends `BasePage`. Declare your locators with dual `@AndroidFindBy` / `@iOSXCUITFindBy` annotations and expose business-level methods. Pass the `ContextManager` received from the test class to the `super` constructor.
 
-       @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='username']")
-       @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField[@name='username']")
-       private WebElement usernameField;
+```java
+package mobileAutomation.pages;
 
-       @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='password']")
-       @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField[@name='password']")
-       private WebElement passwordField;
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import mobileAutomation.utilities.BasePage;
+import mobileAutomation.utilities.ContextManager;
+import org.openqa.selenium.WebElement;
 
-       @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='login']")
-       @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='login']")
-       private WebElement loginButton;
+public class LoginPage extends BasePage {
 
-       public void login(String username, String password) {
-           type(usernameField, username);
-           type(passwordField, password);
-           hideKeyboard();
-           click(loginButton);
-       }
-   }
-   ```
-2. Call the page methods from your TestNG scripts, wiring in media uploads, Excel data, and visual checks as needed.
-   ```java
-   package mobileAutomation.tests;
+    public LoginPage(ContextManager context) {
+        super(context);
+    }
 
-   import mobileAutomation.pages.LoginPage;
-   import mobileAutomation.utilities.BaseTest;
-   import org.testng.annotations.Test;
+    @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='username']")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField[@name='username']")
+    private WebElement usernameField;
 
-   import java.util.Map;
+    @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='password']")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField[@name='password']")
+    private WebElement passwordField;
 
-   public class LoginTest extends BaseTest {
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='login']")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='login']")
+    private WebElement loginButton;
 
-       {
-           filePaths = new String[]{
-                   "src/test/java/mobileAutomation/testFiles/WELCOME_BANNER.png"
-           };
-       }
+    public void login(String username, String password) {
+        type(usernameField, username);
+        type(passwordField, password);
+        hideKeyboard();
+        click(loginButton);
+    }
+}
+```
 
-       @Test(dataProvider = "getTestData")
-       public void loginWithValidCredentials(String username, String password) {
-           LoginPage loginPage = new LoginPage();
-           loginPage.login(username, password);
-           loginPage.validateScreenVisible("LoginSuccess");
-       }
-   }
-   ```
-- **BrowserStack/LambdaTest media:** setting `filePaths` pushes custom assets before the remote session starts. See `Uploading Custom Media to Cloud Sessions` for deeper configuration tips.
-- **Excel data:** the shared `getTestData` provider supplies each test invocation with a row keyed to the method name. Details live in `Data-Driven Execution`.
-- **Visual assertions:** call helpers like `validateScreenVisible` once a flow completes. Baseline management is covered in `Visual Assertion Baselines`.
+### 2. BaseTest — wiring TestNG annotations to BaseManager
+
+`BaseTest` lives in `src/test/java/mobileAutomation/` and is the only class that carries TestNG annotations. It extends `BaseManager` (which holds all lifecycle logic) and each annotated method does nothing but delegate to the matching `BaseManager` method. **You never modify this class** — it is the fixed bridge between TestNG and the framework.
+
+```java
+package mobileAutomation;
+
+import mobileAutomation.utilities.BaseManager;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+
+import java.lang.reflect.Method;
+
+public class BaseTest extends BaseManager {
+
+    @BeforeSuite
+    public void onBeforeSuite() {
+        beforeSuite();                        // starts Appium server (local) + initialises ExtentReports
+    }
+
+    @BeforeClass
+    public void onBeforeClass() {
+        beforeClass();                        // uploads media to cloud, creates the Appium driver
+    }
+
+    @BeforeMethod
+    public void onBeforeMethod(ITestResult result) {
+        beforeMethod(result);                 // resets driver on retry, opens a new ExtentTest node
+    }
+
+    @DataProvider(name = "getTestData")
+    public Object[][] onDataProvider(Method method) {
+        return dataProvider(method);          // reads rows from Testdata.xlsx keyed by method name
+    }
+
+    @AfterMethod
+    public void onAfterMethod(ITestResult result) {
+        afterMethod(result);                  // logs pass/fail/skip + screenshots to the report
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void onAfterClass(ITestContext context) {
+        afterClass(context);                  // quits the Appium driver, marks cloud session status
+    }
+
+    @AfterSuite
+    public void onAfterSuite() {
+        afterSuite();                         // stops Appium server (local) + flushes ExtentReports
+    }
+}
+```
+
+> **Why this split?** `BaseManager` holds all the logic and lives in `src/main` so it can be shared freely. `BaseTest` stays in `src/test` because TestNG annotations must be on a class that the test runner discovers — keeping them here avoids coupling the framework core to the test scope.
+
+### 3. Create a Test class
+
+Add a class under `src/test/java/mobileAutomation/testcases/` that extends `BaseTest`. Instantiate page objects inside test methods by passing `getDriverContext()`.
+
+```java
+package mobileAutomation.testcases;
+
+import mobileAutomation.BaseTest;
+import mobileAutomation.pages.LoginPage;
+import org.testng.annotations.Test;
+
+public class LoginTest extends BaseTest {
+
+    @Test(
+            groups = {"Smoke", "Regression"},
+            dataProvider = "getTestData",
+            description = "Login with valid credentials"
+    )
+    public void loginWithValidCredentials(String username, String password) {
+        LoginPage loginPage = new LoginPage(getDriverContext());
+        loginPage.login(username, password);
+    }
+}
+```
+
+### 4. Add test data
+
+Open `src/test/java/mobileAutomation/testData/Testdata.xlsx`. Each test class gets its own sheet named after the class. Add a row for every `@Test` method that uses `dataProvider = "getTestData"`, with the method name in the first column followed by the parameter values.
+
+```
+Sheet name : LoginTest
+┌──────────────────────────┬──────────────┬──────────────┐
+│ TestCaseName             │ username     │ password     │
+├──────────────────────────┼──────────────┼──────────────┤
+│ loginWithValidCredentials│ standard_user│ secret_sauce │
+└──────────────────────────┴──────────────┴──────────────┘
+```
+
+### 5. Upload test files to cloud sessions (optional)
+
+If your test needs custom media available on the remote device (PDFs, images, etc.), drop the files under `src/test/java/mobileAutomation/testFiles/` and assign `filePaths` in an instance initializer block. The framework uploads them before `@BeforeClass` creates the driver session and injects the returned media IDs into the capabilities automatically.
+
+```java
+public class LoginTest extends BaseTest {
+
+    {
+        filePaths = new String[]{
+                "src/test/java/mobileAutomation/testFiles/SAMPLE_PDF_FILE.pdf",
+                "src/test/java/mobileAutomation/testFiles/SAMPLE_IMAGE_FILE.png"
+        };
+    }
+
+    // ... test methods
+}
+```
+
+Leave `filePaths` unset for local or runs that need no extra media.
+
+### 6. Add image-based locators or visual baselines (optional)
+
+When using image-based element finding or visual comparison helpers, place PNG baseline screenshots under `src/test/java/mobileAutomation/imageLocators/` in the matching platform folder. The filename convention is:
+
+```
+BASELINE_<ScreenName>_<DeviceNameWithoutSpaces>.png
+```
+
+Example:
+```
+imageLocators/
+├── Android/
+│   └── BASELINE_LandingPage_emulator-5554.png
+└── iOS/
+    └── BASELINE_LandingPage_iPhone16Pro.png
+```
+
+On the first run without an existing baseline the framework captures one automatically and skips the assertion; subsequent runs compare against it and write diffs to `VisualCheckResults/`.
 
 ## Running Tests
 Run everything from the project root.
@@ -145,28 +316,6 @@ Run everything from the project root.
   2. Re-run the same Maven command; the framework provisions the remote driver, uploads any configured media, and reports session status.
 - Alternatively, right-click any test class or method annotated with `@Test` in your IDE and choose `Run` for a quick ad-hoc execution.
 
-### Uploading Custom Media to Cloud Sessions
-- Add the assets you need (PDFs, images, etc.) to the repository or ensure they are reachable from the JVM running the tests.
-- In any test class that extends `BaseTest`, assign `filePaths` with absolute or project-relative locations. For example:
-  ```java
-  {
-      filePaths = new String[]{
-              "src/test/java/mobileAutomation/testFiles/SAMPLE_PDF_FILE.pdf",
-              "src/test/java/mobileAutomation/testFiles/SAMPLE_IMAGE_FILE.png"
-      };
-  }
-  ```
-- During `@BeforeClass`, the framework uploads those files to the active cloud using REST APIs (`/app-automate/upload-media` for BrowserStack, `/media/upload` for LambdaTest) and captures the returned media IDs.
-- The media IDs are automatically injected into the session capabilities (`appium:browserstack.uploadMedia` or `lt:Options.uploadMedia`), so your custom files are ready on the remote device before test steps execute.
-- Leave `filePaths` unset to skip uploads on runs that don't require additional media.
-
-### Data-Driven Execution
-- The `@DataProvider` in `BaseTest` pulls values from `src/test/java/mobileAutomation/testData/Testdata.xlsx`. Add rows keyed by the test method name to extend scenarios.
-
-### Visual Assertion Baselines
-- Baseline screenshots live under `src/test/java/mobileAutomation/imageLocators/<Platform>/`.
-- Filenames follow `BASELINE_<Name>_<DeviceNameWithoutSpaces>.png`.
-- On first run without an existing baseline, the framework captures one automatically and skips the assertion; subsequent runs compare against it and store diffs in `VisualCheckResults/`.
 
 ## Reports & Logs
 - ExtentReports HTML output is written to `TestReport/<SuiteName>_<timestamp>.html` and includes step logs plus screenshots for pass/fail events.

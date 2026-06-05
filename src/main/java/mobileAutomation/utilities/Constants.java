@@ -1,4 +1,4 @@
-package mobileAutomation;
+package mobileAutomation.utilities;
 
 public final class Constants {
 
@@ -19,7 +19,7 @@ public final class Constants {
     public static final String TEST_DATA_EXCEL_SHEET_NAME = "Sheet1";
     public static final String EXTENT_REPORT_NAME = "Automation Execution Report";
     public static final String EXTENT_REPORT_DOCUMENT_TITLE = "Automation Test Report";
-    public static final String EXTENT_REPORT_FOLDER_WITH_PREFIX = "TestReport";
+    public static final String EXTENT_REPORT_FOLDER_WITH_PREFIX = "TestReport/Report_";
     public static final String EXTENT_REPORT_DATE_TIME_FORMAT = "yyyy-MM-dd HH-mm-ss";
     public static final String IMAGE_LOCATOR_PATH = "src/test/java/mobileAutomation/imageLocators/";
     public static final String IMAGE_RESULTS_FOLDER = "VisualCheckResults/";

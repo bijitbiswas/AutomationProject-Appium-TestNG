@@ -2,39 +2,42 @@ package mobileAutomation.utilities;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
-import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.*;
 import mobileAutomation.utilities.automationInterfaces.*;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
-// PageActionsManager is the main controller to send the context(driver, wait etc.) to the actual implementation
+// BasePage is the main controller to send the context(driver, wait etc.) to the actual implementation
 public class BasePage implements
         InteractionInterface,
         ValidationInterface,
         MobileGeneralInterface,
-        ImageInterface {
+        ImageInterface,
+        ReportingInterface
+{
 
     protected AppiumDriver mobileDriver;
     private final InteractionInterface interactionInterface;
     private final ValidationInterface validationInterface;
     private final MobileGeneralInterface mobileGeneralInterface;
     private final ImageInterface imageInterface;
+    private final ReportingInterface reportingInterface;
     private final Double MATCH_THRESHOLD = Constants.IMAGE_MATCH_THRESHOLD;
     private final int SCALING_FACTOR = Constants.IMAGE_SCALING_FACTOR;
 
-    public BasePage() {
+    public BasePage(ContextManager context) {
 
-        this.mobileDriver = DriverManager.getMobileDriver();
+        this.mobileDriver = context.getAppiumDriver();
         // To initialize the page elements in a generic way
         PageFactory.initElements(new AppiumFieldDecorator(mobileDriver), this);
 
 
         // Below Interfaces will Delegate to the Implementation function
-        this.interactionInterface = new InteractionFunction();
-        this.validationInterface = new ValidationFunction();
-        this.mobileGeneralInterface = new MobileGeneralFunction();
-        this.imageInterface = new ImageFunction();
+        this.interactionInterface = new InteractionFunction(context);
+        this.validationInterface = new ValidationFunction(context);
+        this.mobileGeneralInterface = new MobileGeneralFunction(context);
+        this.imageInterface = new ImageFunction(context);
+        this.reportingInterface = new ReportingFunction(context);
     }
 
 
@@ -221,10 +224,10 @@ public class BasePage implements
 
     // ================== Reporting Functions ==================
     public void addSuccessLabelWithScreenshot(String labelName) {
-        ExtentReportManager.logPass(labelName);
+        reportingInterface.addSuccessLabelWithScreenshot(labelName);
     }
 
     public void addSuccessLabel(String labelName) {
-        ExtentReportManager.logPassWithScreenshot(labelName);
+        reportingInterface.addSuccessLabel(labelName);
     }
 }

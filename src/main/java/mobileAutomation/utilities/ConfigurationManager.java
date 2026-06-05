@@ -1,6 +1,5 @@
 package mobileAutomation.utilities;
 
-import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.json.JSONObject;
 import org.openqa.selenium.remote.DesiredCapabilities;

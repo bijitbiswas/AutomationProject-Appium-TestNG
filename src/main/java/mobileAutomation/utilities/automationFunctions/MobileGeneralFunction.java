@@ -3,8 +3,8 @@ package mobileAutomation.utilities.automationFunctions;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import mobileAutomation.Constants;
-import mobileAutomation.utilities.DriverManager;
+import mobileAutomation.utilities.Constants;
+import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.MobileGeneralInterface;
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
@@ -27,11 +27,11 @@ public class MobileGeneralFunction extends GeneralFunction implements MobileGene
     FluentWait<AppiumDriver> fluentWait;
     private final String driverName;
 
-    public MobileGeneralFunction() {
-        this.mobileDriver = DriverManager.getMobileDriver();
-        this.wait = DriverManager.getMobileWait();
-        this.fluentWait = DriverManager.getMobileFluentWait();
-        this.driverName = DriverManager.getDriverName();
+    public MobileGeneralFunction(ContextManager context) {
+        this.mobileDriver = context.getAppiumDriver();
+        this.wait = context.getWait();
+        this.fluentWait = context.getFluentWait();
+        this.driverName = context.getDriverName();
     }
 
 

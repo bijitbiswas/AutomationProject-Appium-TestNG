@@ -2,8 +2,8 @@ package mobileAutomation.utilities.automationFunctions;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import mobileAutomation.Constants;
-import mobileAutomation.utilities.DriverManager;
+import mobileAutomation.utilities.Constants;
+import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.InteractionInterface;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -18,13 +18,15 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
     WebDriverWait wait;
     FluentWait<AppiumDriver> fluentWait;
     String driverName;
+    ContextManager contextManager;
     GeneralFunction generalFunction = new GeneralFunction();
 
-    public InteractionFunction() {
-        this.mobileDriver = DriverManager.getMobileDriver();
-        this.wait = DriverManager.getMobileWait();
-        this.fluentWait = DriverManager.getMobileFluentWait();
-        this.driverName = DriverManager.getDriverName();
+    public InteractionFunction(ContextManager context) {
+        this.mobileDriver = context.getAppiumDriver();
+        this.wait = context.getWait();
+        this.fluentWait = context.getFluentWait();
+        this.driverName = context.getDriverName();
+        this.contextManager = context;
     }
 
     private By getBy(String locatorType, String locatorValue) {
@@ -154,9 +156,11 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
 
     @Override
     public void swipeUpUntilVisible(WebElement element) {
+        MobileGeneralFunction mobileGeneralFunction = new MobileGeneralFunction(contextManager);
+        ValidationFunction validationFunction = new ValidationFunction(contextManager);
         for (int i = 0; i <= Constants.SWIPE_RETRY_COUNT; i++) {
-            if (!new ValidationFunction().isElementVisible(element)) {
-                new MobileGeneralFunction().swipeUp();
+            if (!validationFunction.isElementVisible(element)) {
+                mobileGeneralFunction.swipeUp();
             } else {
                 break;
             }
@@ -170,7 +174,7 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
 
         for (int i = 0; i <= Constants.SWIPE_RETRY_COUNT; i++) {
             if (!isVisible(locator, locatorValue)) {
-                new MobileGeneralFunction().swipeUp();
+                new MobileGeneralFunction(contextManager).swipeUp();
             } else {
                 break;
             }
@@ -178,7 +182,7 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
     }
 
     private boolean isVisible(String locator, String locatorValue) {
-        ValidationFunction validationFunction = new ValidationFunction();
+        ValidationFunction validationFunction = new ValidationFunction(contextManager);
         return switch (locator.toLowerCase()) {
             case "xpath" -> validationFunction.isElementVisibleByXpath(locatorValue);
             case "id" -> validationFunction.isElementVisibleById(locatorValue);

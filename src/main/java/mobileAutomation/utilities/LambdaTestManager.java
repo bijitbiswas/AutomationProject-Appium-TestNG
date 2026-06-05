@@ -5,7 +5,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.openqa.selenium.JavascriptExecutor;
-import mobileAutomation.Constants;
+
 import java.io.File;
 import java.util.ArrayList;
 

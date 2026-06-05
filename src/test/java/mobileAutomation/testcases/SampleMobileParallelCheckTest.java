@@ -1,7 +1,7 @@
 package mobileAutomation.testcases;
 
 import mobileAutomation.pages.SampleLoginBasePage;
-import mobileAutomation.utilities.BaseTest;
+import mobileAutomation.BaseTest;
 import org.testng.annotations.Test;
 
 public class SampleMobileParallelCheckTest extends BaseTest {
@@ -13,7 +13,7 @@ public class SampleMobileParallelCheckTest extends BaseTest {
     )
     public void parallelCheckTest() {
 
-        sampleLoginPg = new SampleLoginBasePage();
+        sampleLoginPg = new SampleLoginBasePage(getDriverContext());
 
         sampleLoginPg.sleep(5);
 

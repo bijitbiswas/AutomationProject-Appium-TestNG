@@ -3,11 +3,13 @@ package mobileAutomation.utilities;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import mobileAutomation.Constants;
 import mobileAutomation.utilities.automationFunctions.GeneralFunction;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -17,94 +19,81 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DriverManager extends GeneralFunction {
-    private static String driverName;
-    private static final ThreadLocal<AppiumDriver> mobileDriver = new ThreadLocal<>();
-    private static final ThreadLocal<WebDriverWait> mobileWait = new ThreadLocal<>();
-    private static final ThreadLocal<FluentWait<AppiumDriver>> mobileFluentWait = new ThreadLocal<>();
 
-    public static void initializeDriver(ConfigurationManager configurationManager) {
+    private final ContextManager contextManager = new ContextManager();
+    private final ConfigurationManager configurationManager;
+    public DriverManager(ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
+    }
+    public void createDriver() {
 
-        driverName = configurationManager.driverName;
+        AppiumDriver appiumDriver = createMobileDriver();
+        FluentWait<AppiumDriver> fluentWait = createFluentWait(appiumDriver);
+        WebDriverWait wait = createWebDriverWait(appiumDriver);
 
-        if (mobileDriver.get() == null) {
-            boolean isLambdaTest = driverName.equalsIgnoreCase(Constants.LAMBDATEST_ANDROID)
-                    || driverName.equalsIgnoreCase(Constants.LAMBDATEST_IOS);
-            boolean isBrowserstack = driverName.equalsIgnoreCase(Constants.BROWSERSTACK_ANDROID)
-                    || driverName.equalsIgnoreCase(Constants.BROWSERSTACK_IOS);
-
-            if (isLambdaTest) {
-                initializeLambdaTestDriver(driverName, configurationManager);
-            } else if (isBrowserstack) {
-                initializeBrowserstackDriver(driverName, configurationManager);
-            } else {
-                initializeLocalDriver(driverName, configurationManager);
-            }
-
-            mobileWait.set(createWebDriverWait(configurationManager.waitTime));
-            mobileFluentWait.set(createFluentWait(configurationManager.waitTime));
-
-            System.out.println("******* Mobile Driver is initialized *******");
-        }
+        contextManager.initialize(appiumDriver, wait, fluentWait, configurationManager.driverName);
+        System.out.println("******* Mobile Driver is initialized *******");
     }
 
-    public static AppiumDriver getMobileDriver() {
-        if (mobileDriver.get() == null) {
-            throw new IllegalStateException("Driver is not initialized. Call initializeDriver() first.");
-        }
-        return mobileDriver.get();
-    }
+    public void quitDriver(boolean testPassed) {
 
-    public static String getDriverName() {
-        return driverName;
-    }
-
-    public static WebDriverWait getMobileWait() {
-        if(mobileWait.get() == null){
-            throw new IllegalStateException("Wait is not initialized. Call initializeDriver() first.");
-        }
-        return mobileWait.get();
-    }
-
-    public static FluentWait<AppiumDriver> getMobileFluentWait() {
-        if(mobileFluentWait.get() == null){
-            throw new IllegalStateException("Fluent Wait is not initialized. Call initializeDriver() first.");
-        }
-        return mobileFluentWait.get();
-    }
-
-    public static void quitDriver(boolean testPassed) {
         // Mark test status on LambdaTest/BrowserStack
-        if (driverName.contains(Constants.LAMBDATEST)) {
-            LambdaTestManager.markLambdaTestStatus(getMobileDriver(), testPassed);
-        } else if (driverName.contains(Constants.BROWSERSTACK)) {
-            BrowserStackManager.markBrowserStackStatus(getMobileDriver(), testPassed);
+        if (configurationManager.driverName.contains(Constants.LAMBDATEST)) {
+            LambdaTestManager.markLambdaTestStatus(contextManager.getAppiumDriver(), testPassed);
+        } else if (configurationManager.driverName.contains(Constants.BROWSERSTACK)) {
+            BrowserStackManager.markBrowserStackStatus(contextManager.getAppiumDriver(), testPassed);
         }
 
-        // Quit the mobile driver
-        getMobileDriver().quit();
-
-        println("Mobile Driver is closed");
-        mobileDriver.remove();
-        mobileWait.remove();
-        mobileFluentWait.remove();
-        ServerManager.stopServer();
+        if (contextManager.getAppiumDriver() != null) {
+            contextManager.getAppiumDriver().quit();
+            contextManager.clear();
+            println("Driver closed successfully");
+        } else {
+            println("Driver is not created or is already closed");
+        }
     }
 
+    public void resetDriver(ITestResult result) {
+        IRetryAnalyzer analyzer = result.getMethod().getRetryAnalyzer(result);
+        boolean isRetrying = analyzer instanceof RetryAnalyzer && ((RetryAnalyzer) analyzer).isRetrying();
+        if (isRetrying) {
+            quitDriver(false);
+            createDriver();
+        }
+    }
 
-    private static void initializeLocalDriver(String driverName, ConfigurationManager configurationManager) {
-        ServerManager.startServer();
+    public ContextManager getDriverContext() {
+        return contextManager;
+    }
+
+    private AppiumDriver createMobileDriver() {
+        String driverName = configurationManager.driverName;
+
+        AppiumDriver appiumDriver = switch (configurationManager.driverName) {
+            case Constants.LAMBDATEST_ANDROID, Constants.LAMBDATEST_IOS ->
+                    initializeLambdaTestDriver(driverName, configurationManager);
+            case Constants.BROWSERSTACK_ANDROID, Constants.BROWSERSTACK_IOS ->
+                    initializeBrowserstackDriver(driverName, configurationManager);
+            case Constants.ANDROID, Constants.IOS -> initializeLocalDriver(driverName, configurationManager);
+            default -> throw new IllegalArgumentException("Unsupported driverName : " + driverName);
+        };
+        println("Driver created successfully");
+        return appiumDriver;
+    }
+
+    private AppiumDriver initializeLocalDriver(String driverName, ConfigurationManager configurationManager) {
         URL serverUrl = ServerManager.getServer().getUrl();
-
+        println("Creating " + driverName + " Driver");
         if (driverName.equalsIgnoreCase(Constants.ANDROID)) {
-            mobileDriver.set(new AndroidDriver(serverUrl, getAndroidCapabilities(configurationManager)));
+            return new AndroidDriver(serverUrl, getAndroidCapabilities(configurationManager));
         } else if (driverName.equalsIgnoreCase(Constants.IOS)) {
-            mobileDriver.set(new IOSDriver(serverUrl, getIOSCapabilities(configurationManager)));
+            return new IOSDriver(serverUrl, getIOSCapabilities(configurationManager));
         } else {
             throw new IllegalArgumentException("Unsupported local platform: " + driverName);
         }
     }
 
-    private static void initializeLambdaTestDriver(String driverName, ConfigurationManager configurationManager) {
+    private AppiumDriver initializeLambdaTestDriver(String driverName, ConfigurationManager configurationManager) {
 
         String lambdaTestAuth = configurationManager.cloudProviderAuth;
         String lambdaTestURL = "https://" + lambdaTestAuth + Constants.LAMBDATEST_GRID_URL;
@@ -114,17 +103,17 @@ public class DriverManager extends GeneralFunction {
         } catch (IllegalArgumentException | MalformedURLException e) {
             throw new RuntimeException("Invalid LambdaTest URL", e);
         }
-
+        println("Creating " + driverName + " Driver");
         if (driverName.equalsIgnoreCase(Constants.LAMBDATEST_ANDROID)) {
-            mobileDriver.set(new AndroidDriver(gridUrl, getLambdaTestCapabilities(configurationManager)));
+            return new AndroidDriver(gridUrl, getLambdaTestCapabilities(configurationManager));
         } else if (driverName.equalsIgnoreCase(Constants.LAMBDATEST_IOS)) {
-            mobileDriver.set(new IOSDriver(gridUrl, getLambdaTestCapabilities(configurationManager)));
+            return new IOSDriver(gridUrl, getLambdaTestCapabilities(configurationManager));
         } else {
             throw new IllegalArgumentException("Unsupported LambdaTest platform: " + driverName);
         }
     }
 
-    private static void initializeBrowserstackDriver(String driverName, ConfigurationManager configurationManager) {
+    private AppiumDriver initializeBrowserstackDriver(String driverName, ConfigurationManager configurationManager) {
 
         URL gridUrl;
         try {
@@ -132,17 +121,17 @@ public class DriverManager extends GeneralFunction {
         } catch (IllegalArgumentException | MalformedURLException e) {
             throw new RuntimeException("Invalid Browserstack URL", e);
         }
-
+        println("Creating " + driverName + " Driver");
         if (driverName.equalsIgnoreCase(Constants.BROWSERSTACK_ANDROID)) {
-            mobileDriver.set(new AndroidDriver(gridUrl, getBrowserstackCapabilities(configurationManager)));
+            return new AndroidDriver(gridUrl, getBrowserstackCapabilities(configurationManager));
         } else if (driverName.equalsIgnoreCase(Constants.BROWSERSTACK_IOS)) {
-            mobileDriver.set(new IOSDriver(gridUrl, getBrowserstackCapabilities(configurationManager)));
+            return new IOSDriver(gridUrl, getBrowserstackCapabilities(configurationManager));
         } else {
             throw new IllegalArgumentException("Unsupported Browserstack platform: " + driverName);
         }
     }
 
-    private static DesiredCapabilities getAndroidCapabilities(ConfigurationManager configurationManager) {
+    private DesiredCapabilities getAndroidCapabilities(ConfigurationManager configurationManager) {
         DesiredCapabilities capabilities = configurationManager.androidCapabilities;
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("appium:automationName", "UiAutomator2");
@@ -155,7 +144,7 @@ public class DriverManager extends GeneralFunction {
         return capabilities;
     }
 
-    private static DesiredCapabilities getIOSCapabilities(ConfigurationManager configurationManager) {
+    private DesiredCapabilities getIOSCapabilities(ConfigurationManager configurationManager) {
         DesiredCapabilities capabilities = configurationManager.iOSCapabilities;
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("appium:automationName", "XCUITest");
@@ -163,7 +152,7 @@ public class DriverManager extends GeneralFunction {
         return capabilities;
     }
 
-    private static DesiredCapabilities getBrowserstackCapabilities(ConfigurationManager configurationManager) {
+    private DesiredCapabilities getBrowserstackCapabilities(ConfigurationManager configurationManager) {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         HashMap<String, Object> browserstackOptions = configurationManager.browserstackCapabilities;
@@ -202,7 +191,7 @@ public class DriverManager extends GeneralFunction {
         return capabilities;
     }
 
-    private static DesiredCapabilities getLambdaTestCapabilities(ConfigurationManager configurationManager) {
+    private DesiredCapabilities getLambdaTestCapabilities(ConfigurationManager configurationManager) {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         HashMap<String, Object> lambdaTestOptions = configurationManager.lambdaTestCapabilities;
@@ -233,14 +222,14 @@ public class DriverManager extends GeneralFunction {
         return capabilities;
     }
 
-    private static FluentWait<AppiumDriver> createFluentWait(Long waitTimeInSecs) {
-        return new FluentWait<>(getMobileDriver())
-                .withTimeout(Duration.ofSeconds(waitTimeInSecs))
+    private FluentWait<AppiumDriver> createFluentWait(AppiumDriver appiumDriver) {
+        return new FluentWait<>(appiumDriver)
+                .withTimeout(Duration.ofSeconds(configurationManager.waitTime))
                 .pollingEvery(Duration.ofSeconds(Constants.FLUENT_WAIT_POLLING_TIME_IN_SECS));
     }
 
-    private static WebDriverWait createWebDriverWait(Long waitTimeInSecs) {
-        return new WebDriverWait(getMobileDriver(), Duration.ofSeconds(waitTimeInSecs));
+    private WebDriverWait createWebDriverWait(AppiumDriver appiumDriver) {
+        return new WebDriverWait(appiumDriver, Duration.ofSeconds(configurationManager.waitTime));
     }
 
 }

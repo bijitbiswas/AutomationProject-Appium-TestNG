@@ -16,11 +16,10 @@ import java.nio.file.Paths;
 
 public class ServerManager extends GeneralFunction {
 
-    private static final ThreadLocal<AppiumDriverLocalService> service = new ThreadLocal<>();
+    private static AppiumDriverLocalService service;
 
-
-    public static void startServer() {
-        if (service.get() == null) {
+    public static synchronized void startServer() {
+        if (service == null) {
             println("Starting Appium Server");
 
             ensureImagesPluginInstalled();
@@ -32,21 +31,21 @@ public class ServerManager extends GeneralFunction {
                 throw new AppiumServerHasNotBeenStartedLocallyException("Appium server not started. ABORT!!!");
             }
 
-            service.set(localService);
+            service = localService;
             println("Appium Server started on: " + localService.getUrl());
         }
     }
 
     public static AppiumDriverLocalService getServer() {
-        return service.get();
+        return service;
     }
 
-    public static void stopServer() {
-        if (service.get() != null) {
+    public static synchronized void stopServer() {
+        if (service != null) {
             println("Stopping Appium Server");
-            getServer().stop();
+            service.stop();
+            service = null;
             println("Appium Server stopped");
-            service.remove();
         }
     }
 

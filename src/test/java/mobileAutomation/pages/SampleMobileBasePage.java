@@ -3,9 +3,14 @@ package mobileAutomation.pages;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import mobileAutomation.utilities.BasePage;
+import mobileAutomation.utilities.ContextManager;
 import org.openqa.selenium.WebElement;
 
 public class SampleMobileBasePage extends BasePage {
+
+    public SampleMobileBasePage(ContextManager context) {
+        super(context);
+    }
 
     @iOSXCUITFindBy(xpath = "//*[@value='%s']/preceding-sibling::XCUIElementTypeImage[@name='Product Image']")
     @AndroidFindBy(xpath = "//*[@text='%s']/preceding-sibling::android.widget.ImageView[@content-desc='Product Image']")

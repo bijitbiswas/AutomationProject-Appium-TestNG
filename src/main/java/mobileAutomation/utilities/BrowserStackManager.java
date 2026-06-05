@@ -4,7 +4,6 @@ import io.appium.java_client.AppiumDriver;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import mobileAutomation.Constants;
 import org.openqa.selenium.JavascriptExecutor;
 
 import java.io.File;

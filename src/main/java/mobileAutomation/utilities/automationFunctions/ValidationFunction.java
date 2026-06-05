@@ -2,8 +2,8 @@ package mobileAutomation.utilities.automationFunctions;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import mobileAutomation.Constants;
-import mobileAutomation.utilities.DriverManager;
+import mobileAutomation.utilities.Constants;
+import mobileAutomation.utilities.ContextManager;
 import mobileAutomation.utilities.automationInterfaces.ValidationInterface;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -22,11 +22,11 @@ public class ValidationFunction extends GeneralFunction implements ValidationInt
     String driverName;
     GeneralFunction generalFunction = new GeneralFunction();
 
-    public ValidationFunction() {
-        this.mobileDriver = DriverManager.getMobileDriver();
-        this.wait = DriverManager.getMobileWait();
-        this.fluentWait = DriverManager.getMobileFluentWait();
-        this.driverName = DriverManager.getDriverName();
+    public ValidationFunction(ContextManager context) {
+        this.mobileDriver = context.getAppiumDriver();
+        this.wait = context.getWait();
+        this.fluentWait = context.getFluentWait();
+        this.driverName = context.getDriverName();
     }
 
 

@@ -2,7 +2,7 @@ package mobileAutomation.testcases;
 
 import mobileAutomation.pages.SampleLoginBasePage;
 import mobileAutomation.pages.SampleMobileBasePage;
-import mobileAutomation.utilities.BaseTest;
+import mobileAutomation.BaseTest;
 import org.testng.annotations.Test;
 
 public class SampleMobileIOSTest extends BaseTest {
@@ -26,8 +26,8 @@ public class SampleMobileIOSTest extends BaseTest {
     )
     public void addItemsToCart() {
 
-        sampleLoginPg = new SampleLoginBasePage();
-        sampleMobilePg = new SampleMobileBasePage();
+        sampleLoginPg = new SampleLoginBasePage(getDriverContext());
+        sampleMobilePg = new SampleMobileBasePage(getDriverContext());
 
         sampleLoginPg.login(null, null);
 
