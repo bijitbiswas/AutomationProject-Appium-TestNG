@@ -3,6 +3,10 @@
 <suite name="Sample automation suite" verbose="1"
        configfailurepolicy="continue" thread-count="2" parallel="tests">
 
+    <listeners>
+        <listener class-name="mobileAutomation.utilities.RetryListener"/>
+    </listeners>
+
     <test name="TC_01 Sample mobile automation test"
           annotations="JDK" enabled="true" >
         <classes>
