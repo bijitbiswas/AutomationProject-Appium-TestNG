@@ -328,16 +328,19 @@ Run everything from the project root.
 - When using real devices, grant necessary permissions and update capability JSON with valid UDIDs/platform versions.
 - BrowserStack/LambdaTest executions require stable network access; see the respective dashboards for live sessions and device logs.
 
-## ⚠️ Trial Version License
+## License
 
-This framework can be **tried free for 30 days**.
+This project is made available for **trial and evaluation purposes only**.
 
-After the trial period, you must:
+- You may use, run, and modify this framework for personal learning, internal evaluation, or proof-of-concept work.
+- Redistribution, sublicensing, or use in commercial products without explicit written permission from the author is not permitted.
+- This software is provided **as is**, without warranty of any kind. The author is not liable for any damages arising from its use.
 
-- Stop using the framework, or
-- Obtain written permission from the author, or
-- Purchase a commercial license
+For commercial licensing or extended use, contact the project maintainer via the GitHub repository.
 
-**License:** See [LICENSE](./LICENSE)
+**See [LICENSE](./LICENSE)**
+
+---
 
 Contact: biswas.bijit1994@gmail.com
+*Built with Appium 10.0.0 · TestNG 7.11.0 · ExtentReports 5.1.2*
