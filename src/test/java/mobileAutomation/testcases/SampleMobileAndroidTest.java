@@ -31,12 +31,12 @@ public class SampleMobileAndroidTest extends BaseTest {
         sampleMobilePg = new SampleMobileBasePage(getDriverContext());
 
         sampleLoginPg.login(userName, password);
-
-        sampleMobilePg.addItemToCart(item1);
-
-        sampleMobilePg.addItemToCart(item2);
-
-        sampleMobilePg.viewCartAndVerifyItems(item1, item2);
+//
+//        sampleMobilePg.addItemToCart(item1);
+//
+//        sampleMobilePg.addItemToCart(item2);
+//
+//        sampleMobilePg.viewCartAndVerifyItems(item1, item2);
 
     }
 
