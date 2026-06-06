@@ -23,27 +23,10 @@ pipeline {
             choices: ["Android", "iOS"],
             description: 'Required * Select PLATFORM to run test on'
         )
-
-        activeChoiceReactiveParam(
-            name: 'SUITE',
-            description: 'Required * Select test suite to run (options based on selected platform)',
-            filterable: false,
-            choiceType: 'PT_SINGLE_SELECT',
-            referencedParameters: 'PLATFORM',
-            script: [
-                $class: 'GroovyScript',
-                script: [
-                    classpath: [],
-                    sandbox: true,
-                    script: '''
-                        if (PLATFORM == "iOS") {
-                            return ["SampleIOSSuite"]
-                        } else {
-                            return ["SampleAndroidSuite"]
-                        }
-                    '''
-                ]
-            ]
+        choice(
+             name: 'SUITE',
+             choices: ["SampleAndroidSuite", "SampleIOSSuite"],
+             description: 'Required * Select SUITE to run test on'
         )
 
     }
