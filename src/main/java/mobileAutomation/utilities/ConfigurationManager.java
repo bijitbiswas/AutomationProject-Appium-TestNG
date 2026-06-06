@@ -20,6 +20,7 @@ public class ConfigurationManager extends GeneralFunction {
     static Properties properties;
     final public String driverName = getDriverName();
     final Long waitTime = getWaitTime();
+    final boolean isJenkinsRun = getIsJenkinsRun();
     final DesiredCapabilities androidCapabilities = loadCapabilities("AndroidCapabilities");
     final DesiredCapabilities iOSCapabilities = loadCapabilities("iOSCapabilities");
     final HashMap<String, Object> lambdaTestCapabilities = loadLambdaTestCapabilities();
@@ -133,6 +134,11 @@ public class ConfigurationManager extends GeneralFunction {
         String userName = jsonObject.getString("userName");
         String accessKey = jsonObject.getString("accessKey");
         return userName + ":" + accessKey;
+    }
+
+    private boolean getIsJenkinsRun() {
+        assert properties != null;
+        return Boolean.parseBoolean(properties.getProperty("IsJenkinsRun"));
     }
 
 }

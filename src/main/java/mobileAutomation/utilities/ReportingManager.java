@@ -32,14 +32,14 @@ public class ReportingManager extends GeneralFunction {
 
         // If executed from Jenkins Report_ folder should not have timestamp as it will be
         // difficult to generate HTML  Report in Jenkins
-        if(false) {
+        if(configuration.isJenkinsRun) {
             reportFolderLocation = reportFolderLocation + "Folder";
         } else {
             reportFolderLocation = reportFolderLocation + time;
         }
 
         // Get only the suite name
-        String suiteName = Paths.get("Bijit_Sample_Suite")
+        String suiteName = Paths.get("Bijit_WebAutomation")
                 .getFileName()
                 .toString().replace(".xml", "");
 
