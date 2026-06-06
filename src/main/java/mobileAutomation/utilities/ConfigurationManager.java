@@ -93,14 +93,18 @@ public class ConfigurationManager extends GeneralFunction {
     }
 
     private HashMap<String, Object> loadLambdaTestCapabilities() {
-        String lambdaTestCapabilities = properties.getProperty("LambdaTestCapabilities");
-        JSONObject jsonObject = new JSONObject(lambdaTestCapabilities);
-
         HashMap<String, Object> capabilitiesMap = new HashMap<>();
-        for (String key : jsonObject.keySet()) {
-            Object keyValue = jsonObject.get(key);
-            if (!Objects.equals(key, "userName") && !Objects.equals(key, "accessKey")) {
-                capabilitiesMap.put(key, keyValue.toString());
+
+        assert properties != null;
+        if (properties.getProperty("LambdaTestCapabilities") != null) {
+            String lambdaTestCapabilities = properties.getProperty("LambdaTestCapabilities");
+            JSONObject jsonObject = new JSONObject(lambdaTestCapabilities);
+
+            for (String key : jsonObject.keySet()) {
+                Object keyValue = jsonObject.get(key);
+                if (!Objects.equals(key, "userName") && !Objects.equals(key, "accessKey")) {
+                    capabilitiesMap.put(key, keyValue.toString());
+                }
             }
         }
         return capabilitiesMap;
