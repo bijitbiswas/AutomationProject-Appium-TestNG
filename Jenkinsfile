@@ -56,12 +56,12 @@ pipeline {
         stage('Publish Extent HTML Report') {
             steps {
 
-            sh '
+            sh '''
             echo "Report Directory:"
                                ls -la ${REPORT_DIR}
                                echo "HTML Files:"
                                find ${REPORT_DIR} -name "*.html"
-            '
+            '''
                 script {
 
                     def reportPath = "${env.REPORT_DIR}/${params.SUITE}.html"
