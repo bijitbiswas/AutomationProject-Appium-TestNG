@@ -3,13 +3,17 @@
 Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It supports Android and iOS testing on local devices/emulators as well as BrowserStack and LambdaTest clouds, and layers in data-driven execution, visual validation, and rich reporting.
 
 ## Key Features
-- Unified driver lifecycle that starts/stops a local Appium server and handles BrowserStack/LambdaTest sessions automatically.
-- Page Object Model with reusable interaction, validation, mobile utility, and image-recognition helpers.
-- Data-driven tests backed by Excel (`Testdata.xlsx`) and TestNG data providers.
-- ExtentReports HTML reports with automatic screenshots for pass/fail and optional media uploads to BrowserStack and LambdaTest.
-- Built-in helpers to push custom media to your remote device session before each run.
-- Visual assertions via the Appium Images plugin with baseline management and diff artifacts.
-- One-stop mobile automation stack that spans local simulators/emulators, plugged-in devices, and BrowserStack/LambdaTest real-device clouds for both Android and iOS.
+
+- **Unified Driver Lifecycle** — Automatically starts and stops a local Appium server per suite, so tests need no manual server management.
+- **Page Object Model (POM)** — Clean separation between test logic and UI interactions via page classes
+- **Interface-driven design** — Interaction, Validation, Reporting, and Web actions are defined as interfaces and injected into pages through `BasePage`, making the contract explicit and implementations swappable
+- **Data-driven testing** — Test data loaded from Excel (`.xlsx`) via Apache POI, mapped to test methods by name through a `@DataProvider`
+- **Extent HTML Reports** — Step-level pass/fail logging with screenshots captured automatically on each test method completion
+- **Visual Validation** — Image-based assertions via the Appium Images plugin compare against stored baselines and write diff artifacts to `VisualCheckResults/` for easy triage.
+- **Retry Mechanism** — Failed tests are automatically retried once via `RetryAnalyzer` and `RetryListener`, reducing noise from transient flakiness without any changes to test code.
+- **Cross-Platform Support (iOS & Android)** — A single framework and shared Page Object layer covers Android emulators/physical devices and iOS simulators/real devices, with dual `@AndroidFindBy` / `@iOSXCUITFindBy` locators enabling the same page classes to run on both platforms.
+- **CI/CD ready** — `Jenkinsfile` included with parameterised browser and suite selection, dynamic config generation, and report publishing
+- **Cloud Device Farm Integration** — Seamlessly targets BrowserStack and LambdaTest real-device clouds with automatic capability enrichment, pre-run media uploads, and session status reporting.
 
 ## Cloud Device Integrations
 Harness built-in integrations with the leading real device clouds—upload custom media, stream live sessions, and report results without leaving the framework.
@@ -25,13 +29,18 @@ Harness built-in integrations with the leading real device clouds—upload custo
 - **Cloud Device Farms:** Seamlessly launch the same tests on BrowserStack and LambdaTest with pre-run media uploads, automatic capability enrichment, and status updates pushed back to their dashboards.
 
 ## Prerequisites
-- Java 18+ and Maven 3.8+ in your `PATH`.
-- Node.js 18+ and Appium 2.x (`npm install -g appium`).
-- Appium Images plugin for visual checks
-    - Windows local runs install it automatically when you launch the framework.
-    - macOS users install it manually via `sudo appium plugin install images`.
-- Xcode + iOS simulators (macOS only) and/or Android SDK + emulators for local runs.
-- BrowserStack and/or LambdaTest credentials (optional, for cloud execution).
+
+| Requirement | Details | Notes |
+|---|---|---|
+| **Java 18+** | JDK 18 or higher in your `PATH` | Verify with `java -version` |
+| **Maven 3.8+** | Apache Maven 3.8 or higher in your `PATH` | Verify with `mvn -v` |
+| **Node.js 18+** | Node.js 18 or higher | Required to run Appium |
+| **Appium 2.x** | Install globally via `npm install -g appium` | Verify with `appium -v` |
+| **Appium Images Plugin** | For visual validation checks | **Windows:** installed automatically on framework launch. **macOS:** run `sudo appium plugin install images` manually |
+| **Android SDK** | Android SDK with at least one emulator configured | Required for Android local runs |
+| **Xcode + iOS Simulator** | Xcode with iOS simulators (macOS only) | Required for iOS local runs |
+| **BrowserStack Credentials** | `userName` and `accessKey` from your BrowserStack account | Optional — cloud execution only |
+| **LambdaTest Credentials** | `userName` and `accessKey` from your LambdaTest account | Optional — cloud execution only |
 
 ## Project Structure
 
@@ -101,20 +110,6 @@ AutomationProject-Appium-TestNG/
 └── logs/
     └── AppiumServer.log                           # Local Appium server log
 ```
-
-## Configuration
-1. Open `config/config.properties`; every target platform reads from this single file.
-2. Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
-3. Update the matching capability JSON blob with real device identifiers, platform versions, credentials, and app references.
-
-- **Simulators/Emulators and Physical devices:** keep `DriverName` as `Android` or `iOS` and set `deviceName`/`platformVersion` at your local emulator or simulator. Supply `appPackage`/`bundleId` or `app` paths appropriate for local binaries, `udid` (iOS), and any other required capabilities for the plugged-in hardware.
-- **BrowserStack:** switch `DriverName` to `BrowserStack-Android` or `BrowserStack-iOS`, fill `userName`, `accessKey`, `app` (either uploaded ID or `bs://` handle), and optional build metadata.
-- **LambdaTest:** switch `DriverName` accordingly, provide `userName`, `accessKey`, `app`, and remote device attributes; optional `build` labels help you track sessions in the dashboard.
-- The capability blocks map directly to targets in `config.properties`:
-  - `AndroidCapabilities` → Android emulator or plugged-in device.
-  - `iOSCapabilities` → iOS simulator or real device.
-  - `BrowserstackCapabilities` → BrowserStack cloud sessions.
-  - `LambdaTestCapabilities` → LambdaTest cloud sessions.
 
 ## Initial Setup
 1. Install prerequisites listed above and verify `mvn -v` and `appium -v`.
@@ -299,6 +294,20 @@ imageLocators/
 ```
 
 On the first run without an existing baseline the framework captures one automatically and skips the assertion; subsequent runs compare against it and write diffs to `VisualCheckResults/`.
+
+## Configuration
+1. Open `config/config.properties`; every target platform reads from this single file.
+2. Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
+3. Update the matching capability JSON blob with real device identifiers, platform versions, credentials, and app references.
+
+- **Simulators/Emulators and Physical devices:** keep `DriverName` as `Android` or `iOS` and set `deviceName`/`platformVersion` at your local emulator or simulator. Supply `appPackage`/`bundleId` or `app` paths appropriate for local binaries, `udid` (iOS), and any other required capabilities for the plugged-in hardware.
+- **BrowserStack:** switch `DriverName` to `BrowserStack-Android` or `BrowserStack-iOS`, fill `userName`, `accessKey`, `app` (either uploaded ID or `bs://` handle), and optional build metadata.
+- **LambdaTest:** switch `DriverName` accordingly, provide `userName`, `accessKey`, `app`, and remote device attributes; optional `build` labels help you track sessions in the dashboard.
+- The capability blocks map directly to targets in `config.properties`:
+  - `AndroidCapabilities` → Android emulator or plugged-in device.
+  - `iOSCapabilities` → iOS simulator or real device.
+  - `BrowserstackCapabilities` → BrowserStack cloud sessions.
+  - `LambdaTestCapabilities` → LambdaTest cloud sessions.
 
 ## Running Tests
 Run everything from the project root.
