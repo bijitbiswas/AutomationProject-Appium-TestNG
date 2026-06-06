@@ -60,14 +60,14 @@ pipeline {
                     if (!fileExists(reportPath)) {
                         error "❌ Report not found at: ${reportPath}"
                     }
-                }
-sh '''
-echo "Report Directory:"
-ls -la ${REPORT_DIR}
+                    sh '''
+                    echo "Report Directory:"
+                    ls -la ${REPORT_DIR}
 
-echo "HTML Files:"
-find ${REPORT_DIR} -name "*.html"
-'''
+                    echo "HTML Files:"
+                    find ${REPORT_DIR} -name "*.html"
+                    '''
+                }
                 publishHTML([
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
