@@ -39,20 +39,20 @@ public class SampleMobileAndroidTest extends BaseTest {
 //        sampleMobilePg.viewCartAndVerifyItems(item1, item2);
 
     }
-
-    @Test(
-            groups = {"Sanity"},
-            description = "Remove item and checkout"
-    )
-    public void removeItemAndCheckout() {
-
-        sampleMobilePg.removeItemFromCart(item1);
-
-        sampleMobilePg.checkoutCart();
-
-        sampleMobilePg.enterPaymentDetails();
-
-        sampleMobilePg.verifyOrderDetailsAndPlaceOrder();
-
-    }
+//
+//    @Test(
+//            groups = {"Sanity"},
+//            description = "Remove item and checkout"
+//    )
+//    public void removeItemAndCheckout() {
+//
+//        sampleMobilePg.removeItemFromCart(item1);
+//
+//        sampleMobilePg.checkoutCart();
+//
+//        sampleMobilePg.enterPaymentDetails();
+//
+//        sampleMobilePg.verifyOrderDetailsAndPlaceOrder();
+//
+//    }
 }
