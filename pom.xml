@@ -4,9 +4,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>AutomationProject-Appium-TestNG</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>io.github.bijitbiswas</groupId>
+    <artifactId>appium-testng-framework</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>AutomationProject-Appium-TestNG</name>
+    <description>Comprehensive mobile UI automation framework built with Appium 2 and TestNG. Supports Android and iOS testing on local devices/emulators as well as BrowserStack and LambdaTest clouds, with data-driven execution, visual validation, and rich Extent reporting.</description>
+    <url>https://github.com/bijitbiswas/AutomationProject-Appium-TestNG</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>bijitbiswas</id>
+            <name>Bijit Biswas</name>
+            <email>biswas.bijit1994@gmail.com</email>
+            <url>https://github.com/bijitbiswas</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/bijitbiswas/AutomationProject-Appium-TestNG.git</connection>
+        <developerConnection>scm:git:ssh://github.com/bijitbiswas/AutomationProject-Appium-TestNG.git</developerConnection>
+        <url>https://github.com/bijitbiswas/AutomationProject-Appium-TestNG/tree/master</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -16,16 +44,83 @@
 
     <build>
         <testSourceDirectory>src/test/java</testSourceDirectory>
-        <finalName>AutomationProject-Selenium-TestNG</finalName>
+        <finalName>appium-testng-framework</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <!--                    The testFailureIgnore option in the Maven Surefire Plugin controls whether -->
-                    <!--                    your build fails when tests fail-->
                     <testFailureIgnore>false</testFailureIgnore>
+                </configuration>
+            </plugin>
+
+            <!-- Required by Maven Central: attach sources JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Required by Maven Central: attach Javadoc JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Required by Maven Central: GPG-sign all artifacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.7</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+            </plugin>
+
+            <!-- Sonatype Central Portal publisher (new portal, replaces nexus-staging-maven-plugin) -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- Matches the <server id> in ~/.m2/settings.xml -->
+                    <publishingServerId>central</publishingServerId>
+                    <!-- Set to true to release automatically; false leaves it in "pending" for manual review -->
+                    <autoPublish>false</autoPublish>
                 </configuration>
             </plugin>
         </plugins>
@@ -87,7 +182,6 @@
             <artifactId>rest-assured</artifactId>
             <version>5.5.6</version>
         </dependency>
-
     </dependencies>
 
 </project>
