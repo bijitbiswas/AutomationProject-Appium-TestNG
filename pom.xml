@@ -51,11 +51,13 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
+<!--                    The testFailureIgnore option in the Maven Surefire Plugin controls whether -->
+<!--                    your build fails when tests fail-->
                     <testFailureIgnore>false</testFailureIgnore>
                 </configuration>
             </plugin>
 
-            <!-- Required by Maven Central: attach sources JAR -->
+            <!-- Generates sources JAR (required by Maven Central) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -70,14 +72,11 @@
                 </executions>
             </plugin>
 
-            <!-- Required by Maven Central: attach Javadoc JAR -->
+            <!-- Generates Javadoc JAR (required by Maven Central) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
-                <configuration>
-                    <doclint>none</doclint>
-                </configuration>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -88,11 +87,11 @@
                 </executions>
             </plugin>
 
-            <!-- Required by Maven Central: GPG-sign all artifacts -->
+            <!-- GPG signing (required by Maven Central) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.7</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -110,17 +109,17 @@
                 </configuration>
             </plugin>
 
-            <!-- Sonatype Central Portal publisher (new portal, replaces nexus-staging-maven-plugin) -->
+            <!-- Sonatype Central publishing plugin -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>0.5.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <!-- Matches the <server id> in ~/.m2/settings.xml -->
                     <publishingServerId>central</publishingServerId>
                     <!-- Set to true to release automatically; false leaves it in "pending" for manual review -->
-                    <autoPublish>false</autoPublish>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
         </plugins>
