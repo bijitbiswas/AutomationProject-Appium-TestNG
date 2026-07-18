@@ -47,8 +47,10 @@ public class BaseManager {
         driverManager.getDriverContext().setExtentTest(reportingManager.createTest(result));
     }
 
-    protected Object[][] dataProvider(Method method) {
-        return ExcelManager.getMethodData(method.getName());
+    protected String[][] dataProvider(Method method) {
+        System.out.println("********Getting test data for method: " + method.getName() + "********");
+        String testDataFolder = method.getDeclaringClass().getPackageName().split("\\.")[0];
+        return new ExcelManager().getMethodData(method.getName(), testDataFolder);
     }
 
     protected void afterMethod(ITestResult result) {

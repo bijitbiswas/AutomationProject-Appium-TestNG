@@ -7,7 +7,8 @@ def writeConfigFile(platformName, workspace) {
     iOSCapabilities          = { 'deviceName':'', 'platformVersion':'18.2', 'udid':'29EA159B-7E7F-4323-A1FD-6E2AB17E4CBD', 'bundleId':'com.saucelabs.mydemo.app.ios', 'noReset':'false'}
     IsJenkinsRun=true
     WaitTime=10"""
-    writeFile(file: "${workspace}/config/config.properties", text: data)
+    sh "mkdir -p ${workspace}/src/test/resources"
+    writeFile(file: "${workspace}/src/test/resources/config.properties", text: data)
     echo "DEBUG: Config file is created"
 }
 

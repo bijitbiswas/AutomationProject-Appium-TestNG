@@ -25,7 +25,7 @@ public class BaseTest extends BaseManager {
     }
 
     @DataProvider(name = "getTestData")
-    public Object[][] onDataProvider(Method method) {
+    public String[][] onDataProvider(Method method) {
         return dataProvider(method);
     }
 

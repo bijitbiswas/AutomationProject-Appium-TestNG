@@ -26,7 +26,7 @@ Harness built-in integrations with the leading real device clouds—upload custo
 </p>
 
 ## Platform Coverage
-- **Local Simulators/Emulators:** Spin up Android Emulator or iOS Simulator sessions backed by a managed Appium 2 server, with shared capabilities loaded from `config/config.properties`.
+- **Local Simulators/Emulators:** Spin up Android Emulator or iOS Simulator sessions backed by a managed Appium 2 server, with shared capabilities loaded from `src/test/resources/config.properties`.
 - **Physical Devices:** Plug in real hardware, override desired capabilities, and leverage the same Page Object and reporting layers without code changes.
 - **Cloud Device Farms:** Seamlessly launch the same tests on BrowserStack and LambdaTest with pre-run media uploads, automatic capability enrichment, and status updates pushed back to their dashboards.
 
@@ -54,8 +54,6 @@ Harness built-in integrations with the leading real device clouds—upload custo
 AutomationProject-Appium-TestNG/
 │
 ├── apps/                                          # Android (.apk) and iOS (.app) binaries for local runs
-├── config/
-│   └── config.properties                          # Driver selection and all capability definitions
 ├── MobileTestSuites/
 │   ├── SampleAndroidSuite.xml                     # TestNG suite for Android
 │   └── SampleIOSSuite.xml                         # TestNG suite for iOS
@@ -70,7 +68,7 @@ AutomationProject-Appium-TestNG/
 │   │       ├── Constants.java                     # Shared constants (driver names, URLs, etc.)
 │   │       ├── ContextManager.java                # Holds AppiumDriver, waits, and ExtentTest per class
 │   │       ├── DriverManager.java                 # Creates, resets, and quits the Appium driver
-│   │       ├── ExcelManager.java                  # Reads test data rows from Testdata.xlsx
+│   │       ├── ExcelManager.java                  # Reads test data rows from src/test/resources/testData/<topLevelPackage>/Testdata.xlsx
 │   │       ├── LambdaTestManager.java             # LambdaTest upload and session status helpers
 │   │       ├── Region.java                        # Region model for image-based assertions
 │   │       ├── ReportingManager.java              # ExtentReports setup, test creation, and logging
@@ -100,11 +98,15 @@ AutomationProject-Appium-TestNG/
 │       │   ├── SampleMobileAndroidTest.java
 │       │   ├── SampleMobileIOSTest.java
 │       │   └── SampleMobileParallelCheckTest.java
-│       ├── testData/
-│       │   └── Testdata.xlsx                      # Excel workbook — one sheet per test class, rows keyed by method name
-│       ├── testFiles/                             # Files uploaded to cloud device sessions (PDFs, images, etc.)
-│       │   ├── SAMPLE_IMAGE_FILE.png
-│       │   └── SAMPLE_PDF_FILE.pdf
+│       └── testFiles/                             # Files uploaded to cloud device sessions (PDFs, images, etc.)
+│           ├── SAMPLE_IMAGE_FILE.png
+│           └── SAMPLE_PDF_FILE.pdf
+│
+│   └── test/resources/
+│       ├── config.properties                      # Your config (overrides JAR defaults)
+│       ├── testData/                              # Test data Excel files, one subfolder per top-level package
+│       │   └── <topLevelPackage>/                 # Folder name = first segment of your test class package (auto-resolved)
+│       │       └── Testdata.xlsx                  # One sheet (Sheet1), rows keyed by @Test method name
 │       └── imageLocators/                         # Visual baseline screenshots (optional — only for image assertions)
 │           ├── Android/
 │           │   └── BASELINE_<Name>_<DeviceId>.png
@@ -125,7 +127,7 @@ AutomationProject-Appium-TestNG/
    ```bash
    sudo appium plugin install images
    ```
-3. Configure `config/config.properties` as outlined in the **Configuration** section, including driver selection, capability details, and any optional wait settings.
+3. Create `src/test/resources/config.properties` in your project as outlined in the **Configuration** section.
 4. (Optional) Place additional app binaries under `apps/` and reference them in the capability JSON.
 5. If you plan to upload media to LambdaTest or BrowserStack during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
 
@@ -255,7 +257,7 @@ public class LoginTest extends BaseTest {
 
 ### Step 4: Add Test Data
 
-Add test data to Testdata.xlsx in a sheet named with test name like `loginWithValidCredentials`. Add a row for every `@Test` method that uses `dataProvider = "getTestData"`, with the method name in the first column followed by the parameter values.
+Place `Testdata.xlsx` at `src/test/resources/testData/<topLevelPackage>/Testdata.xlsx`. The subfolder name is **automatically resolved** at runtime from the first segment of your test class's package — e.g. a class in `mobileAutomation.testcases` resolves to the `mobileAutomation` subfolder. Add a row in `Sheet1` for every `@Test` method that uses `dataProvider = "getTestData"`, with the method name in the first column followed by the parameter values.
 
 ```
 Sheet name : Sheet1
@@ -300,7 +302,7 @@ Leave `filePaths` unset for local or runs that need no extra media.
 
 ### Step 7: Add image-based locators or visual baselines (optional)
 
-When using image-based element finding or visual comparison helpers, place PNG baseline screenshots under `src/test/java/mobileAutomation/imageLocators/` in the matching platform folder. The filename convention is:
+When using image-based element finding or visual comparison helpers, place PNG baseline screenshots under `src/test/resources/imageLocators/` in the matching platform folder. The filename convention is:
 
 ```
 BASELINE_<ScreenName>_<DeviceNameWithoutSpaces>.png
@@ -308,7 +310,7 @@ BASELINE_<ScreenName>_<DeviceNameWithoutSpaces>.png
 
 Example:
 ```
-imageLocators/
+src/test/resources/imageLocators/
 ├── Android/
 │   └── BASELINE_LandingPage_emulator-5554.png
 └── iOS/
@@ -320,7 +322,13 @@ On the first run without an existing baseline the framework captures one automat
 ---
 
 ## Configuration
-1. Open / Create `config/config.properties` at root project directory.
+
+The framework resolves configuration in priority order — the first source that provides a value wins:
+JVM system property >> Environment variable >> `config.properties` on classpath >> JAR bundled defaults.
+
+### Recommended: classpath config file
+
+1. Create `src/test/resources/config.properties` in your project.
 2. Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
 3. Update the matching capability JSON blob with real device identifiers, platform versions, credentials, and app references.
 
@@ -333,7 +341,7 @@ On the first run without an existing baseline the framework captures one automat
   - `BrowserstackCapabilities` → BrowserStack cloud sessions.
   - `LambdaTestCapabilities` → LambdaTest cloud sessions.
 
-Sample `config/config.properties`:
+  Sample as below:
 ```properties
 # 'DriverName' values should be either of 'Android', 'iOS', 'BrowserStack-Android', 'BrowserStack-iOS', 'LambdaTest-Android', 'LambdaTest-iOS'
 DriverName               = Android
@@ -345,6 +353,17 @@ LambdaTestCapabilities   = {'userName':'', 'accessKey':'', 'app':'', 'deviceName
 
 # Wait time in seconds to wait for an element
 WaitTime=10
+```
+
+### CI / command line override
+
+```bash
+# Override browser and URL without touching config.properties
+mvn clean test -DDriverName=Android
+
+# Or via environment variables
+export DRIVER_NAME=Android
+mvn clean test
 ```
 
 ---
@@ -361,7 +380,7 @@ Run everything from the project root.
   mvn clean test -DsuiteXmlFile=MobileTestSuites/SampleAndroidSuite.xml -Dgroups=Smoke
   ```
 - To target BrowserStack or LambdaTest:
-  1. Set `DriverName` and credentials/app IDs in `config/config.properties`.
+  1. Set `DriverName` and credentials/app IDs in `src/test/resources/config.properties`.
   2. Re-run the same Maven command; the framework provisions the remote driver, uploads any configured media, and reports session status.
 - Alternatively, right-click any test class or method annotated with `@Test` in your IDE and choose `Run` for a quick ad-hoc execution.
 

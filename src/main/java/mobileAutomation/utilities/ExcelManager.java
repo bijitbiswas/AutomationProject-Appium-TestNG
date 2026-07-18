@@ -6,30 +6,37 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ExcelManager {
 
-    public static String[][] getMethodData(String methodName) {
+    private XSSFSheet excelWSheet = null;
 
-        try (FileInputStream excelFile = new FileInputStream(Constants.TEST_DATA_EXCEL_PATH);
-             XSSFWorkbook excelWBook = new XSSFWorkbook(excelFile)) {
+    public String[][] getMethodData(String methodName, String testDataFolder) {
 
-            XSSFSheet excelWSheet = excelWBook.getSheet(Constants.TEST_DATA_EXCEL_SHEET_NAME);
-            if (excelWSheet == null) {
-                throw new RuntimeException("Sheet not found: " + Constants.TEST_DATA_EXCEL_SHEET_NAME);
-            }
+        String resourcePath = "/testData/" + testDataFolder + "/Testdata.xlsx";
+        InputStream excelFile = ExcelManager.class.getResourceAsStream(resourcePath);
+        if (excelFile == null) {
+            throw new RuntimeException("Testdata.xlsx not found at classpath:" + resourcePath +
+                    ". Ensure src/test/resources/testData/" + testDataFolder + "/Testdata.xlsx exists in your project.");
+        }
 
-            /* If the test method name is not found in the first column,
-             * testMethodRowNumber will be 0
-             * */
-            int testMethodRowNumber = getMethodRowNumber(excelWSheet, methodName);
-            return getTableArray(excelWSheet, testMethodRowNumber);
+        XSSFWorkbook excelWBook;
+        try {
+            excelWBook = new XSSFWorkbook(excelFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        excelWSheet = excelWBook.getSheet(Constants.TEST_DATA_EXCEL_SHEET_NAME);
+
+        /* If the test method name is not found in the first column,
+         * testMethodRowNumber will be 0
+         * */
+        int testMethodRowNumber = getMethodRowNumber(methodName);
+        return getTableArray(testMethodRowNumber);
     }
 
-    private static int getMethodRowNumber(XSSFSheet excelWSheet, String testMethodName) {
+    private int getMethodRowNumber(String testMethodName) {
         int lastRowCount = excelWSheet.getLastRowNum();
         int testCaseRow = 0;
         int i = 1;
@@ -44,7 +51,7 @@ public class ExcelManager {
         return testCaseRow;
     }
 
-    private static String[][] getTableArray(XSSFSheet excelWSheet, int testMethodRowNumber) {
+    private String[][] getTableArray(int testMethodRowNumber) {
 
         int totalCols;
         try {
