@@ -64,7 +64,7 @@ pipeline {
             '''
                 script {
 
-                    def reportPath = "${env.REPORT_DIR}/Bijit_Automation.html"
+                    def reportPath = "${env.REPORT_DIR}/Appium_Automation_Report.html"
                     if (!fileExists(reportPath)) {
                         error "❌ Report not found at: ${reportPath}"
                     }
@@ -74,7 +74,7 @@ pipeline {
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
                     reportDir: "${env.REPORT_DIR}",
-                    reportFiles: "Bijit_Automation.html",
+                    reportFiles: "Appium_Automation_Report.html",
                     reportName: 'Extent HTML Report'
                 ])
             }

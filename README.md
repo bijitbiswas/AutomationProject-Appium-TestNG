@@ -15,6 +15,8 @@ Comprehensive mobile UI automation framework built with Appium 2 and TestNG. It 
 - **CI/CD ready** — `Jenkinsfile` included with parameterised browser and suite selection, dynamic config generation, and report publishing
 - **Cloud Device Farm Integration** — Seamlessly targets BrowserStack and LambdaTest real-device clouds with automatic capability enrichment, pre-run media uploads, and session status reporting.
 
+---
+
 ## Cloud Device Integrations
 Harness built-in integrations with the leading real device clouds—upload custom media, stream live sessions, and report results without leaving the framework.
 
@@ -27,6 +29,8 @@ Harness built-in integrations with the leading real device clouds—upload custo
 - **Local Simulators/Emulators:** Spin up Android Emulator or iOS Simulator sessions backed by a managed Appium 2 server, with shared capabilities loaded from `config/config.properties`.
 - **Physical Devices:** Plug in real hardware, override desired capabilities, and leverage the same Page Object and reporting layers without code changes.
 - **Cloud Device Farms:** Seamlessly launch the same tests on BrowserStack and LambdaTest with pre-run media uploads, automatic capability enrichment, and status updates pushed back to their dashboards.
+
+---
 
 ## Prerequisites
 
@@ -41,6 +45,8 @@ Harness built-in integrations with the leading real device clouds—upload custo
 | **Xcode + iOS Simulator** | Xcode with iOS simulators (macOS only) | Required for iOS local runs |
 | **BrowserStack Credentials** | `userName` and `accessKey` from your BrowserStack account | Optional — cloud execution only |
 | **LambdaTest Credentials** | `userName` and `accessKey` from your LambdaTest account | Optional — cloud execution only |
+
+---
 
 ## Project Structure
 
@@ -111,6 +117,8 @@ AutomationProject-Appium-TestNG/
     └── AppiumServer.log                           # Local Appium server log
 ```
 
+---
+
 ## Initial Setup
 1. Install prerequisites listed above and verify `mvn -v` and `appium -v`.
 2. (macOS only) From the project root, install the images plugin once:
@@ -121,11 +129,13 @@ AutomationProject-Appium-TestNG/
 4. (Optional) Place additional app binaries under `apps/` and reference them in the capability JSON.
 5. If you plan to upload media to LambdaTest or BrowserStack during tests, populate the `filePaths` array in your test class (extends `BaseTest`) with the files you want to send.
 
+---
+
 ## Writing Your First Test
 
-### 1. Create a Page class
+### Step 1: Create a Page Class
 
-Add a class under `src/test/java/mobileAutomation/pages/` that extends `BasePage`. Declare your locators with dual `@AndroidFindBy` / `@iOSXCUITFindBy` annotations and expose business-level methods. Pass the `ContextManager` received from the test class to the `super` constructor.
+Create a page class extending `BasePage`. Declare your locators with dual `@AndroidFindBy` / `@iOSXCUITFindBy` annotations and expose business-level methods. Pass the `ContextManager` received from the test class to the `super` constructor.
 
 ```java
 package mobileAutomation.pages;
@@ -163,9 +173,9 @@ public class LoginPage extends BasePage {
 }
 ```
 
-### 2. BaseTest — wiring TestNG annotations to BaseManager
+### Step 2: Create a BaseTest Class
 
-`BaseTest` lives in `src/test/java/mobileAutomation/` and is the only class that carries TestNG annotations. It extends `BaseManager` (which holds all lifecycle logic) and each annotated method does nothing but delegate to the matching `BaseManager` method. **You never modify this class** — it is the fixed bridge between TestNG and the framework.
+Create a `BaseTest` extending `BaseManager` and call the delegated TestNG lifecycle methods. **You never modify this class** — it is the fixed bridge between TestNG and the framework.
 
 ```java
 package mobileAutomation;
@@ -216,11 +226,11 @@ public class BaseTest extends BaseManager {
 }
 ```
 
-> **Why this split?** `BaseManager` holds all the logic and lives in `src/main` so it can be shared freely. `BaseTest` stays in `src/test` because TestNG annotations must be on a class that the test runner discovers — keeping them here avoids coupling the framework core to the test scope.
+> `BaseManager` owns all the logic. `BaseTest` (in `src/test`) is purely a thin TestNG adapter — it only maps annotations to `BaseManager` calls. This keeps framework infrastructure free of TestNG lifecycle coupling.
 
-### 3. Create a Test class
+### Step 3: Create a Test Class
 
-Add a class under `src/test/java/mobileAutomation/testcases/` that extends `BaseTest`. Instantiate page objects inside test methods by passing `getDriverContext()`.
+Create a test class extending `BaseTest`.
 
 ```java
 package mobileAutomation.testcases;
@@ -243,12 +253,12 @@ public class LoginTest extends BaseTest {
 }
 ```
 
-### 4. Add test data
+### Step 4: Add Test Data
 
-Open `src/test/java/mobileAutomation/testData/Testdata.xlsx`. Each test class gets its own sheet named after the class. Add a row for every `@Test` method that uses `dataProvider = "getTestData"`, with the method name in the first column followed by the parameter values.
+Add test data to Testdata.xlsx in a sheet named with test name like `loginWithValidCredentials`. Add a row for every `@Test` method that uses `dataProvider = "getTestData"`, with the method name in the first column followed by the parameter values.
 
 ```
-Sheet name : LoginTest
+Sheet name : Sheet1
 ┌──────────────────────────┬──────────────┬──────────────┐
 │ TestCaseName             │ username     │ password     │
 ├──────────────────────────┼──────────────┼──────────────┤
@@ -256,7 +266,19 @@ Sheet name : LoginTest
 └──────────────────────────┴──────────────┴──────────────┘
 ```
 
-### 5. Upload test files to cloud sessions (optional)
+### Step 5: Register in Suite XML
+
+Add the test class to a suite file:
+
+```xml
+<test name="Login Tests">
+    <classes>
+        <class name="mobileAutomation.testcases.LoginTest"/>
+    </classes>
+</test>
+```
+
+### Step 6: Upload test files to cloud sessions (optional)
 
 If your test needs custom media available on the remote device (PDFs, images, etc.), drop the files under `src/test/java/mobileAutomation/testFiles/` and assign `filePaths` in an instance initializer block. The framework uploads them before `@BeforeClass` creates the driver session and injects the returned media IDs into the capabilities automatically.
 
@@ -276,7 +298,7 @@ public class LoginTest extends BaseTest {
 
 Leave `filePaths` unset for local or runs that need no extra media.
 
-### 6. Add image-based locators or visual baselines (optional)
+### Step 7: Add image-based locators or visual baselines (optional)
 
 When using image-based element finding or visual comparison helpers, place PNG baseline screenshots under `src/test/java/mobileAutomation/imageLocators/` in the matching platform folder. The filename convention is:
 
@@ -295,8 +317,10 @@ imageLocators/
 
 On the first run without an existing baseline the framework captures one automatically and skips the assertion; subsequent runs compare against it and write diffs to `VisualCheckResults/`.
 
+---
+
 ## Configuration
-1. Open `config/config.properties`; every target platform reads from this single file.
+1. Open / Create `config/config.properties` at root project directory.
 2. Set `DriverName` to one of `Android`, `iOS`, `BrowserStack-Android`, `BrowserStack-iOS`, `LambdaTest-Android`, or `LambdaTest-iOS`.
 3. Update the matching capability JSON blob with real device identifiers, platform versions, credentials, and app references.
 
@@ -308,6 +332,22 @@ On the first run without an existing baseline the framework captures one automat
   - `iOSCapabilities` → iOS simulator or real device.
   - `BrowserstackCapabilities` → BrowserStack cloud sessions.
   - `LambdaTestCapabilities` → LambdaTest cloud sessions.
+
+Sample `config/config.properties`:
+```properties
+# 'DriverName' values should be either of 'Android', 'iOS', 'BrowserStack-Android', 'BrowserStack-iOS', 'LambdaTest-Android', 'LambdaTest-iOS'
+DriverName               = Android
+
+AndroidCapabilities      = { 'deviceName':'emulator-5554', 'platformVersion':'13.0', 'appPackage':'com.saucelabs.mydemoapp.android', 'appActivity':'com.saucelabs.mydemoapp.android.view.activities.SplashActivity', 'noReset':'false'}
+iOSCapabilities          = { 'deviceName':'', 'platformVersion':'18.2', 'udid':'29EA159B-7E7F-4323-A1FD-6E2AB1XXXXXX', 'bundleId':'com.saucelabs.mydemo.app.ios', 'noReset':'false'}
+BrowserstackCapabilities = {'userName':'', 'accessKey':'', 'app':'', 'deviceName':'Samsung Galaxy S25', 'platformVersion':'15.0', 'buildName':'Android Build'}
+LambdaTestCapabilities   = {'userName':'', 'accessKey':'', 'app':'', 'deviceName':'', 'platformVersion':'', 'build':'iOS Build'}
+
+# Wait time in seconds to wait for an element
+WaitTime=10
+```
+
+---
 
 ## Running Tests
 Run everything from the project root.
