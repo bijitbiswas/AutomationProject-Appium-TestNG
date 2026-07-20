@@ -109,7 +109,7 @@ public class ValidationFunction extends GeneralFunction implements ValidationInt
 
     @Override
     public boolean isElementVisibleByText(String textValue) {
-        String xpathExpression = "//*[contains(@text,'" + textValue + "')] | //*[contains(@value,'" + textValue + "')]";
+        String xpathExpression = "//*[contains(@text,\"" + textValue + "\")] | //*[contains(@value,\"" + textValue + "\")]";
         return conditionCheck(webDriverWait ->
                 webDriverWait.until(ExpectedConditions.refreshed(ExpectedConditions
                         .visibilityOfElementLocated(AppiumBy.xpath(xpathExpression)))), "visibleByText");
@@ -132,12 +132,20 @@ public class ValidationFunction extends GeneralFunction implements ValidationInt
     @Override
     public void validateElementText(WebElement element, String expectedText) {
         println("Validating element text to be " + expectedText);
-        String elementText;
+        String elementText = "";
         WebElement actionElement;
         try {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .visibilityOf(element)));
-            elementText = actionElement.getText().isEmpty() ? "" : actionElement.getText();
+
+            String androidText = actionElement.getText();
+            if (!androidText.isBlank())
+                elementText = androidText;
+            if (elementText.isBlank()) {
+                String iOSText = actionElement.getAttribute("value");
+                if (iOSText != null && !iOSText.isBlank())
+                    elementText = iOSText;
+            }
         } catch (Exception e) {
             println("Failed to find element to get check element text");
             e.printStackTrace();
@@ -150,7 +158,7 @@ public class ValidationFunction extends GeneralFunction implements ValidationInt
     @Override
     public void validateText(String expectedText) {
         println("Validating element text to be " + expectedText + " on screen");
-        String xpathExpression = "//*[contains(@text,'" + expectedText + "')] | //*[contains(@value,'" + expectedText + "')]";
+        String xpathExpression = "//*[contains(@text,\"" + expectedText + "\")] | //*[contains(@value,\"" + expectedText + "\")]";
         Assert.assertTrue(isElementVisibleByXpath(xpathExpression), "Element text " + expectedText + " is not displayed on screen");
         println("Element text " + expectedText + " is displayed on screen");
     }

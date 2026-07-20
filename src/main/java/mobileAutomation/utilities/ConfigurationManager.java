@@ -20,8 +20,8 @@ public class ConfigurationManager extends GeneralFunction {
     final public String driverName = getDriverName();
     final Long waitTime = getWaitTime();
     final boolean isJenkinsRun = getIsJenkinsRun();
-    final DesiredCapabilities androidCapabilities = loadCapabilities("AndroidCapabilities");
-    final DesiredCapabilities iOSCapabilities = loadCapabilities("iOSCapabilities");
+    final DesiredCapabilities androidCapabilities = Constants.ANDROID.equals(driverName) ? loadCapabilities("AndroidCapabilities") : null;
+    final DesiredCapabilities iOSCapabilities = Constants.IOS.equals(driverName) ? loadCapabilities("iOSCapabilities") : null;
     final HashMap<String, Object> lambdaTestCapabilities = loadLambdaTestCapabilities();
     final HashMap<String, Object> browserstackCapabilities = loadBrowserstackCapabilities();
     public String testcaseName;
@@ -86,8 +86,7 @@ public class ConfigurationManager extends GeneralFunction {
     }
 
     private String getDriverName() {
-        assert properties != null;
-        return properties.getProperty("DriverName");
+        return resolve("DriverName");
     }
 
     private Long getWaitTime() {

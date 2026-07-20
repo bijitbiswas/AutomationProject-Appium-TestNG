@@ -60,8 +60,13 @@ public class BaseManager {
     }
 
     protected void afterClass(ITestContext context) {
-        int failedCount = context.getFailedTests().size();
-        int skippedCount = context.getSkippedTests().size();
+        Class<?> currentClass = this.getClass();
+        long failedCount = context.getFailedTests().getAllResults().stream()
+                .filter(r -> r.getTestClass().getRealClass().equals(currentClass))
+                .count();
+        long skippedCount = context.getSkippedTests().getAllResults().stream()
+                .filter(r -> r.getTestClass().getRealClass().equals(currentClass))
+                .count();
         boolean testPassed = (failedCount == 0 && skippedCount == 0);
         driverManager.quitDriver(testPassed);
     }

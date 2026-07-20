@@ -94,7 +94,7 @@ public class InteractionFunction extends GeneralFunction implements InteractionI
     @Override
     public void clickByText(String elementText) {
         WebElement actionElement;
-        String xpathExpression = "//*[@text='" + elementText + "'] | //*[@value='" + elementText + "']";
+        String xpathExpression = "//*[@text=\"" + elementText + "\"] | //*[@value=\"" + elementText + "\"]";
         try {
             actionElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions
                     .elementToBeClickable(AppiumBy.xpath(xpathExpression))));
