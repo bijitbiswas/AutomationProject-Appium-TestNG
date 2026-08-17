@@ -154,19 +154,29 @@ public class LoginPage extends BasePage {
         super(context);
     }
 
-    @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='username']")
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField[@name='username']")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='More-tab-item']")
+    @AndroidFindBy(xpath = "//android.widget.ImageView[@content-desc='View menu']")
+    private WebElement menuBarButton;
+  
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='Login Button']")
+    @AndroidFindBy(xpath = "//android.widget.TextView[@content-desc='Login Menu Item']")
+    private WebElement loginMenuItem;
+  
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/nameET')]")
     private WebElement usernameField;
-
-    @AndroidFindBy(xpath = "//android.widget.EditText[@content-desc='password']")
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField[@name='password']")
+  
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeSecureTextField")
+    @AndroidFindBy(xpath = "//android.widget.EditText[contains(@resource-id,'id/passwordET')]")
     private WebElement passwordField;
-
-    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='login']")
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='login']")
+  
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Login']")
+    @AndroidFindBy(xpath = "//android.widget.Button[@content-desc='Tap to login with given credentials']")
     private WebElement loginButton;
 
     public void login(String username, String password) {
+        click(menuBarButton);
+        click(loginMenuItem);
         type(usernameField, username);
         type(passwordField, password);
         hideKeyboard();
