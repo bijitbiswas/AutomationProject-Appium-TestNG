@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20250517</version>
+            <version>20260814</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
